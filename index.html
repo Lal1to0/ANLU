@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catálogo Exclusivo de Perfumería</title>
+  <title>Catálogo ANLU Perfumes</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -15,45 +15,70 @@
       padding-left: 10px;
       font-size: 0.75rem;
       font-weight: 700;
-      color: #fff;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-      margin-bottom: 5px;
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      margin-bottom: 6px;
+      transition: transform 0.15s ease;
+    }
+    .accord-bar:hover {
+      transform: scaleX(1.02);
     }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen">
 
-  <!-- Header -->
-  <header class="bg-white shadow-sm sticky top-0 z-20">
+  <!-- Encabezado y Barra de Búsqueda -->
+  <header class="bg-white shadow-sm sticky top-0 z-30">
     <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-      <h1 class="text-2xl font-extrabold tracking-wider text-gray-900 uppercase">ANLU Perfumes</h1>
-      <input type="text" id="searchInput" placeholder="Buscar por perfume o marca..." class="w-full md:w-80 px-4 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-gray-800">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl font-black tracking-widest text-gray-900 uppercase">ANLU</span>
+        <span class="text-xs bg-gray-900 text-white font-bold px-2 py-0.5 rounded tracking-wide">PERFUMES</span>
+      </div>
+      <div class="w-full md:w-80 relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-sm"></i>
+        <input type="text" id="searchInput" placeholder="Buscar por nombre o marca..." 
+               class="w-full pl-9 pr-4 py-2 border rounded-full text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 transition">
+      </div>
+    </div>
+
+    <!-- Pestañas de Secciones -->
+    <div class="border-t border-gray-100 bg-white">
+      <div class="max-w-6xl mx-auto px-4 flex gap-2 overflow-x-auto py-2.5 scrollbar-none">
+        <button onclick="filterCategory('todos')" class="filter-btn active px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-900 text-white">Todos</button>
+        <button onclick="filterCategory('hombre')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Hombre</button>
+        <button onclick="filterCategory('mujer')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Mujer</button>
+        <button onclick="filterCategory('unisex')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Unisex</button>
+      </div>
     </div>
   </header>
 
-  <!-- Grid de Perfumes -->
+  <!-- Grilla de Productos -->
   <main class="max-w-6xl mx-auto px-4 py-8">
     <div id="perfumesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    <div id="noResults" class="hidden text-center py-16">
+      <p class="text-gray-500 font-medium text-lg">No encontramos perfumes que coincidan con tu búsqueda.</p>
+    </div>
   </main>
 
-  <!-- Modal Detalle Tipo Fragrantica -->
-  <div id="perfumeModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto">
-      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 text-xl font-bold z-10">&times;</button>
-      
-      <div class="p-6 md:p-8" id="modalContent">
-        <!-- Render dinámico aquí -->
-      </div>
+  <!-- Modal Estilo Fragrantica -->
+  <div id="perfumeModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden p-4 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl relative max-h-[92vh] overflow-y-auto">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 text-2xl font-bold z-10">&times;</button>
+      <div class="p-6 md:p-8" id="modalContent"></div>
     </div>
   </div>
 
   <script>
-    // Tu lista de perfumes (agrega o edita fácilmente aquí)
+    const WHATSAPP_PHONE = "584243306803";
+
+    // Base de datos de perfumes
+    // Puedes duplicar cualquiera de estos bloques para agregar todos los de tu catálogo
     const perfumes = [
       {
         id: 1,
         name: "Odyssey Homme",
         brand: "Armaf",
+        gender: "hombre",
         price: "$35.00",
         image: "https://fimgs.net/mdimg/perfume/375x500.64464.jpg",
         concentration: "Eau de Parfum • 100ml",
@@ -66,49 +91,102 @@
         ],
         topNotes: ["Vainilla", "Ámbar"],
         heartNotes: ["Iris", "Especias", "Notas Orientales"],
-        baseNotes: ["Cuero", "Cedro", "Jazmín"],
-        whatsapp: "584120000000" // Coloca tu número de WhatsApp aquí con código de país
+        baseNotes: ["Cuero", "Cedro", "Jazmín"]
       },
       {
         id: 2,
         name: "Club de Nuit Intense Man",
         brand: "Armaf",
+        gender: "hombre",
         price: "$38.00",
         image: "https://fimgs.net/mdimg/perfume/375x500.34688.jpg",
         concentration: "Eau de Toilette • 105ml",
         accords: [
-          { name: "Cítrico", width: "100%", color: "#F1C40F" },
+          { name: "Cítrico", width: "100%", color: "#D4AC0D" },
           { name: "Ahumado", width: "85%", color: "#34495E" },
           { name: "Afrutado", width: "75%", color: "#E67E22" },
           { name: "Amaderado", width: "60%", color: "#795548" },
           { name: "Cuero", width: "45%", color: "#4E342E" }
         ],
-        topNotes: ["Limón", "Piña", "Grosellas Negras", "Bergamota"],
+        topNotes: ["Limón", "Piña", "Bergamota", "Grosellas Negras"],
         heartNotes: ["Abedul", "Jazmín", "Rosa"],
-        baseNotes: ["Almizcle", "Ámbar Gris", "Pachulí", "Vainilla"],
-        whatsapp: "584120000000"
+        baseNotes: ["Almizcle", "Ámbar Gris", "Pachulí", "Vainilla"]
+      },
+      {
+        id: 3,
+        name: "Yara",
+        brand: "Lattafa",
+        gender: "mujer",
+        price: "$35.00",
+        image: "https://fimgs.net/mdimg/perfume/375x500.76880.jpg",
+        concentration: "Eau de Parfum • 100ml",
+        accords: [
+          { name: "Dulce", width: "100%", color: "#E91E63" },
+          { name: "Avainillado", width: "85%", color: "#F39C12" },
+          { name: "Atalcado", width: "70%", color: "#BA68C8" },
+          { name: "Tropical", width: "55%", color: "#FF7043" },
+          { name: "Floral", width: "45%", color: "#F06292" }
+        ],
+        topNotes: ["Orquídea", "Heliotropo", "Mandarina"],
+        heartNotes: ["Acorde Gourmand", "Frutas Tropicales"],
+        baseNotes: ["Vainilla", "Almizcle", "Sándalo"]
+      },
+      {
+        id: 4,
+        name: "Khamrah",
+        brand: "Lattafa",
+        gender: "unisex",
+        price: "$45.00",
+        image: "https://fimgs.net/mdimg/perfume/375x500.75805.jpg",
+        concentration: "Eau de Parfum • 100ml",
+        accords: [
+          { name: "Especiado Cálido", width: "100%", color: "#A04000" },
+          { name: "Dulce", width: "90%", color: "#D35400" },
+          { name: "Avainillado", width: "80%", color: "#E67E22" },
+          { name: "Canela", width: "70%", color: "#873600" },
+          { name: "Ambarado", width: "60%", color: "#6E2C00" }
+        ],
+        topNotes: ["Canela", "Nuez Moscada", "Bergamota"],
+        heartNotes: ["Dátiles", "Praliné", "Nardos", "Mahonial"],
+        baseNotes: ["Vainilla", "Haba Tonka", "Benjuí", "Mirra", "Madera de Akigala"]
       }
     ];
 
+    let currentCategory = "todos";
     const grid = document.getElementById("perfumesGrid");
+    const noResults = document.getElementById("noResults");
     const modal = document.getElementById("perfumeModal");
     const modalContent = document.getElementById("modalContent");
     const searchInput = document.getElementById("searchInput");
 
     function renderCards(data) {
+      if (data.length === 0) {
+        grid.innerHTML = "";
+        noResults.classList.remove("hidden");
+        return;
+      }
+      noResults.classList.add("hidden");
+
       grid.innerHTML = data.map(p => `
-        <div onclick="openModal(${p.id})" class="bg-white rounded-xl shadow hover:shadow-xl transition duration-200 cursor-pointer overflow-hidden border border-gray-100 flex flex-col justify-between">
-          <div class="h-60 flex items-center justify-center p-4 bg-gray-50">
-            <img src="${p.image}" alt="${p.name}" class="h-full object-contain hover:scale-105 transition duration-300">
+        <div onclick="openModal(${p.id})" class="bg-white rounded-xl shadow-sm hover:shadow-xl transition duration-200 cursor-pointer overflow-hidden border border-gray-200 flex flex-col justify-between group">
+          <div class="h-64 flex items-center justify-center p-4 bg-gray-50/70 group-hover:bg-white transition">
+            <img src="${p.image}" alt="${p.name}" class="h-full object-contain group-hover:scale-105 transition duration-300">
           </div>
           <div class="p-4 flex flex-col justify-between flex-1">
             <div>
-              <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">${p.brand}</span>
-              <h3 class="font-bold text-gray-900 text-lg leading-snug">${p.name}</h3>
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">${p.brand}</span>
+                <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
+                  p.gender === 'hombre' ? 'bg-blue-50 text-blue-600 border border-blue-200' :
+                  p.gender === 'mujer' ? 'bg-pink-50 text-pink-600 border border-pink-200' :
+                  'bg-purple-50 text-purple-600 border border-purple-200'
+                }">${p.gender}</span>
+              </div>
+              <h3 class="font-bold text-gray-900 text-base mt-1 leading-snug">${p.name}</h3>
             </div>
-            <div class="mt-4 flex justify-between items-center">
-              <span class="text-lg font-extrabold text-green-700">${p.price}</span>
-              <button class="text-xs bg-gray-900 text-white px-3 py-1.5 rounded-full font-medium">Ver Ficha</button>
+            <div class="mt-4 flex justify-between items-center pt-3 border-t border-gray-100">
+              <span class="text-lg font-black text-gray-900">${p.price}</span>
+              <button class="text-xs bg-gray-900 text-white px-3 py-1.5 rounded-md font-medium hover:bg-black transition">Ver Notas</button>
             </div>
           </div>
         </div>
@@ -119,13 +197,17 @@
       const p = perfumes.find(item => item.id === id);
       if (!p) return;
 
+      const whatsappText = encodeURIComponent(`Hola ANLU Perfumes, me interesa consultar la disponibilidad del perfume: *${p.name}* (${p.brand}) - ${p.price}`);
+
       modalContent.innerHTML = `
         <div class="flex flex-col md:flex-row gap-6 items-center md:items-start mb-6">
-          <img src="${p.image}" class="w-44 h-44 object-contain rounded-lg border p-2">
+          <div class="w-48 h-48 flex items-center justify-center bg-gray-50 rounded-xl border p-2 flex-shrink-0">
+            <img src="${p.image}" class="max-h-full max-w-full object-contain">
+          </div>
           <div class="flex-1 w-full">
-            <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">${p.brand}</span>
-            <h2 class="text-2xl font-extrabold text-gray-900">${p.name}</h2>
-            <p class="text-xs text-gray-500 mb-4">${p.concentration}</p>
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">${p.brand}</span>
+            <h2 class="text-2xl font-black text-gray-900 leading-tight">${p.name}</h2>
+            <p class="text-xs text-gray-500 mt-1 mb-4">${p.concentration} • <span class="capitalize font-semibold">${p.gender}</span></p>
             
             <h4 class="text-xs font-bold uppercase tracking-wider text-gray-600 mb-2">Acordes Principales</h4>
             ${p.accords.map(a => `
@@ -134,34 +216,34 @@
           </div>
         </div>
 
-        <div class="border-t pt-5">
-          <h4 class="text-center font-bold text-gray-800 text-sm uppercase tracking-wide mb-4">Pirámide Olfativa</h4>
+        <div class="border-t border-gray-100 pt-5">
+          <h4 class="text-center font-bold text-gray-800 text-xs uppercase tracking-widest mb-4">Pirámide Olfativa</h4>
           
           <div class="space-y-3">
             <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
-              <span class="text-xs font-bold text-gray-500 uppercase">Salida:</span>
-              <p class="text-sm font-medium text-gray-800 mt-1">${p.topNotes.join(" • ")}</p>
+              <span class="text-xs font-bold text-gray-500 uppercase">Notas de Salida:</span>
+              <p class="text-sm font-medium text-gray-800 mt-0.5">${p.topNotes.join(" • ")}</p>
             </div>
             <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-pink-500">
-              <span class="text-xs font-bold text-gray-500 uppercase">Corazón:</span>
-              <p class="text-sm font-medium text-gray-800 mt-1">${p.heartNotes.join(" • ")}</p>
+              <span class="text-xs font-bold text-gray-500 uppercase">Notas de Corazón:</span>
+              <p class="text-sm font-medium text-gray-800 mt-0.5">${p.heartNotes.join(" • ")}</p>
             </div>
-            <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-purple-500">
-              <span class="text-xs font-bold text-gray-500 uppercase">Fondo:</span>
-              <p class="text-sm font-medium text-gray-800 mt-1">${p.baseNotes.join(" • ")}</p>
+            <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-amber-600">
+              <span class="text-xs font-bold text-gray-500 uppercase">Notas de Fondo:</span>
+              <p class="text-sm font-medium text-gray-800 mt-0.5">${p.baseNotes.join(" • ")}</p>
             </div>
           </div>
         </div>
 
-        <div class="mt-8 flex justify-between items-center bg-green-50 p-4 rounded-xl border border-green-200">
+        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
           <div>
-            <span class="text-xs text-green-700 font-medium">Precio</span>
-            <div class="text-2xl font-black text-green-800">${p.price}</div>
+            <span class="text-xs text-gray-500 uppercase font-semibold">Precio</span>
+            <div class="text-2xl font-black text-gray-900">${p.price}</div>
           </div>
-          <a href="https://wa.me/${p.whatsapp}?text=${encodeURIComponent('Hola, me interesa el perfume ' + p.name + ' (' + p.brand + ')')}" 
+          <a href="https://wa.me/${WHATSAPP_PHONE}?text=${whatsappText}" 
              target="_blank" 
-             class="bg-[#25D366] text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:opacity-90 flex items-center gap-2">
-            <i class="fa-brands fa-whatsapp text-lg"></i> Pedir por WhatsApp
+             class="w-full sm:w-auto bg-[#25D366] text-white px-6 py-3 rounded-xl font-bold text-sm hover:opacity-95 flex items-center justify-center gap-2 shadow-sm transition">
+            <i class="fa-brands fa-whatsapp text-lg"></i> Consultar por WhatsApp
           </a>
         </div>
       `;
@@ -172,17 +254,33 @@
       modal.classList.add("hidden");
     }
 
-    searchInput.addEventListener("input", (e) => {
-      const q = e.target.value.toLowerCase();
-      const filtered = perfumes.filter(p => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q));
-      renderCards(filtered);
-    });
+    function filterCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.classList.remove("bg-gray-900", "text-white");
+        btn.classList.add("bg-gray-100", "text-gray-600");
+      });
+      event.target.classList.remove("bg-gray-100", "text-gray-600");
+      event.target.classList.add("bg-gray-900", "text-white");
+      applyFilters();
+    }
 
-    // Cerrar modal al hacer clic afuera
+    function applyFilters() {
+      const q = searchInput.value.toLowerCase().trim();
+      const filtered = perfumes.filter(p => {
+        const matchesCategory = currentCategory === "todos" || p.gender === currentCategory;
+        const matchesSearch = p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q);
+        return matchesCategory && matchesSearch;
+      });
+      renderCards(filtered);
+    }
+
+    searchInput.addEventListener("input", applyFilters);
     modal.addEventListener("click", (e) => {
       if (e.target === modal) closeModal();
     });
 
+    // Carga inicial
     renderCards(perfumes);
   </script>
 </body>
