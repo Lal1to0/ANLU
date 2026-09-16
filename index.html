@@ -209,7 +209,14 @@
           const nuevosPerfumes = data.filter(row => row.Nombre && row.Nombre.trim() !== "").map((row, index) => {
             let cleanPrice = (row.Precio || "").toString().replace(/[^0-9.,]/g, "").replace(",", ".");
             let priceVal = parseFloat(cleanPrice);
-            let priceStr = isNaN(priceVal) || priceVal === 0 ? "$0" : "$" + priceVal.toFixed(2);
+
+            // Lectura de stock segura: si no viene o está vacío, asume 1; si es 0, pasa a Bajo Pedido
+            let stockRaw = (row.Stock !== undefined && row.Stock !== null) ? row.Stock.toString().trim() : "1";
+            let stockVal = parseInt(stockRaw, 10);
+            if (isNaN(stockVal)) stockVal = 1;
+
+            let isOutOfStock = stockVal <= 0;
+            let priceStr = (isNaN(priceVal) || priceVal === 0 || isOutOfStock) ? "$0" : "$" + priceVal.toFixed(2);
 
             let accords = [];
             const widths = ["100%", "85%", "70%", "55%", "40%"];
@@ -235,7 +242,7 @@
             };
           });
 
-          // Si los datos cambiaron respecto a lo que había en pantalla, actualiza
+          // Solo actualiza la pantalla si la lista de perfumes cambió
           if (JSON.stringify(nuevosPerfumes) !== JSON.stringify(perfumes)) {
             perfumes = nuevosPerfumes;
             applyFilters();
