@@ -118,9 +118,9 @@
         const data = results.data;
         
         perfumes = data.filter(row => row.Nombre && row.Nombre.trim() !== "").map((row, index) => {
-          let priceVal = parseFloat(row.Precio);
+          let cleanPrice = (row.Precio || "").toString().replace(/[^0-9.,]/g, "").replace(",", ".");
+          let priceVal = parseFloat(cleanPrice);
           let priceStr = isNaN(priceVal) || priceVal === 0 ? "$0" : "$" + priceVal.toFixed(2);
-
           let accords = [];
           const widths = ["100%", "85%", "70%", "55%", "40%"];
           for(let i=1; i<=5; i++) {
