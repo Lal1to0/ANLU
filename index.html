@@ -83,7 +83,6 @@
     // ⚠️ ATENCIÓN: Solo debes editar estas dos líneas de abajo ⚠️
     const WHATSAPP_PHONE = "584243306803";
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS5AE2sLXFhZxsyvbxFAxTFIApUx2fsaxSArZ8JI1_cFxqhjpdCnc8haFrrSIFvbmpEJcxHTiXIHw4D/pub?gid=1819198756&single=true&output=csv"; 
-    // Recuerda que el enlace debe terminar en: /pub?output=csv
     
     let perfumes = [];
     let currentCategory = "todos";
@@ -111,8 +110,8 @@
       return "#5D6D7E"; 
     }
 
-    // Leer la base de datos
-    Papa.parse(SHEET_CSV_URL, {
+    // Leer la base de datos evitando la memoria caché
+    Papa.parse(SHEET_CSV_URL + "&t=" + new Date().getTime(), {
       download: true,
       header: true,
       complete: function(results) {
@@ -172,7 +171,6 @@
           ? '<span class="absolute top-3 right-3 bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Bajo Pedido</span>'
           : '<span class="absolute top-3 right-3 bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Disponible</span>';
 
-        // Si una imagen está rota o vacía, pone una de repuesto
         return `
         <div onclick="openModal(${p.id})" class="bg-white rounded-xl shadow-sm hover:shadow-xl transition duration-200 cursor-pointer overflow-hidden border border-gray-200 flex flex-col justify-between group">
           <div class="h-64 flex items-center justify-center p-4 bg-gray-50/70 group-hover:bg-white transition relative">
