@@ -291,6 +291,14 @@ const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/t
         const matchesSearch = p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q);
         return matchesCategory && matchesSearch;
       });
+
+      // Ordenar: Disponibles primero, Bajo Pedido al final
+      filtered.sort((a, b) => {
+        const aPreorder = a.price === "$0" || a.price === "$0.00";
+        const bPreorder = b.price === "$0" || b.price === "$0.00";
+        return aPreorder - bPreorder;
+      });
+
       renderCards(filtered);
     }
 
