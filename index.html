@@ -79,7 +79,7 @@
     </div>
   </main>
 
-<!-- Botones Flotantes de Redes Sociales (Instagram + WhatsApp) -->
+  <!-- Botones Flotantes de Redes Sociales (Instagram + WhatsApp) -->
   <div class="fixed bottom-5 right-5 z-40 flex flex-col items-center gap-3">
     
     <!-- Botón Flotante Redondo de Instagram -->
@@ -127,12 +127,10 @@
       </button>
     </div>
   </div>
-  
 
   <script>
     const SHEET_ID = "1kCqVj7HIP7oouLyOmwptYOmbXEuzQARgxvmit7EdsXw";
     const GID = "1819198756";
-    const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&t=${Date.now()}`;
 
     const PRIMARY_WA = "584243306803";
     const SECONDARY_WA = "584124596671";
@@ -167,49 +165,71 @@
       return "#5D6D7E"; 
     }
 
-    Papa.parse(SHEET_CSV_URL, {
-      download: true,
-      header: true,
-      complete: function(results) {
-        const data = results.data;
-        
-        perfumes = data.filter(row => row.Nombre && row.Nombre.trim() !== "").map((row, index) => {
-          let cleanPrice = (row.Precio || "").toString().replace(/[^0-9.,]/g, "").replace(",", ".");
-          let priceVal = parseFloat(cleanPrice);
-          let priceStr = isNaN(priceVal) || priceVal === 0 ? "$0" : "$" + priceVal.toFixed(2);
+    // Función que consulta Google Sheets
+    function cargarDatos(esSilencioso = false) {
+      const urlConAntiCache = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&t=${Date.now()}`;
 
-          let accords = [];
-          const widths = ["100%", "85%", "70%", "55%", "40%"];
-          for(let i=1; i<=5; i++) {
-            let aName = row[`Acorde_${i}`];
-            if(aName && aName.trim() !== "") {
-              accords.push({ name: aName.trim(), width: widths[i-1], color: getAccordColor(aName) });
+      Papa.parse(urlConAntiCache, {
+        download: true,
+        header: true,
+        complete: function(results) {
+          const data = results.data;
+          
+          const nuevosPerfumes = data.filter(row => row.Nombre && row.Nombre.trim() !== "").map((row, index) => {
+            let cleanPrice = (row.Precio || "").toString().replace(/[^0-9.,]/g, "").replace(",", ".");
+            let priceVal = parseFloat(cleanPrice);
+            let priceStr = isNaN(priceVal) || priceVal === 0 ? "$0" : "$" + priceVal.toFixed(2);
+
+            let accords = [];
+            const widths = ["100%", "85%", "70%", "55%", "40%"];
+            for(let i=1; i<=5; i++) {
+              let aName = row[`Acorde_${i}`];
+              if(aName && aName.trim() !== "") {
+                accords.push({ name: aName.trim(), width: widths[i-1], color: getAccordColor(aName) });
+              }
             }
-          }
 
-          return {
-            id: index + 1,
-            name: row.Nombre.trim(),
-            brand: (row.Marca || "").trim(),
-            gender: (row.Género || "unisex").trim().toLowerCase(),
-            price: priceStr,
-            image: (row.Imagen_URL || "").trim(),
-            concentration: (row.Concentración || "").trim(),
-            accords: accords,
-            topNotes: row.Notas_Salida ? row.Notas_Salida.split(',').map(s=>s.trim()) : [],
-            heartNotes: row.Notas_Corazón ? row.Notas_Corazón.split(',').map(s=>s.trim()) : [],
-            baseNotes: row.Notas_Fondo ? row.Notas_Fondo.split(',').map(s=>s.trim()) : []
-          };
-        });
-        
-        loading.classList.add("hidden");
-        grid.classList.remove("hidden");
-        applyFilters(); 
-      },
-      error: function(err) {
-        loading.innerHTML = '<p class="text-red-500 font-bold mt-4">Error al conectar con la base de datos de Google Sheets.</p>';
-      }
-    });
+            return {
+              id: index + 1,
+              name: row.Nombre.trim(),
+              brand: (row.Marca || "").trim(),
+              gender: (row.Género || "unisex").trim().toLowerCase(),
+              price: priceStr,
+              image: (row.Imagen_URL || "").trim(),
+              concentration: (row.Concentración || "").trim(),
+              accords: accords,
+              topNotes: row.Notas_Salida ? row.Notas_Salida.split(',').map(s=>s.trim()) : [],
+              heartNotes: row.Notas_Corazón ? row.Notas_Corazón.split(',').map(s=>s.trim()) : [],
+              baseNotes: row.Notas_Fondo ? row.Notas_Fondo.split(',').map(s=>s.trim()) : []
+            };
+          });
+
+          // Si los datos cambiaron respecto a lo que había en pantalla, actualiza
+          if (JSON.stringify(nuevosPerfumes) !== JSON.stringify(perfumes)) {
+            perfumes = nuevosPerfumes;
+            applyFilters();
+          }
+          
+          if (!esSilencioso) {
+            loading.classList.add("hidden");
+            grid.classList.remove("hidden");
+          }
+        },
+        error: function(err) {
+          if (!esSilencioso) {
+            loading.innerHTML = '<p class="text-red-500 font-bold mt-4">Error al conectar con la base de datos de Google Sheets.</p>';
+          }
+        }
+      });
+    }
+
+    // 1. Carga inicial
+    cargarDatos();
+
+    // 2. Comprobación automática cada 20 segundos
+    setInterval(() => {
+      cargarDatos(true);
+    }, 20000);
 
     function renderCards(data) {
       if (data.length === 0) {
