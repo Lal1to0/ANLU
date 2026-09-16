@@ -32,21 +32,43 @@
     }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen">
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-16">
 
+  <!-- Header -->
   <header class="bg-white shadow-sm sticky top-0 z-30">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-      <div class="flex items-center">
-        <!-- Tu Logo -->
-        <img src="1234.png" alt="ANLU Parfums" class="h-16 md:h-32 object-contain">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+      
+      <!-- Logo y Redes en Móvil -->
+      <div class="flex items-center justify-between w-full md:w-auto">
+        <img src="1234.png" alt="ANLU Parfums" class="h-14 md:h-20 object-contain">
+        
+        <!-- Iconos de Redes para Pantallas Chicas -->
+        <div class="flex items-center gap-3 md:hidden">
+          <a href="https://instagram.com/anluu.lg" target="_blank" class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-500 via-pink-500 to-purple-600 flex items-center justify-center text-white shadow-sm hover:opacity-90 transition" title="Instagram">
+            <i class="fa-brands fa-instagram text-lg"></i>
+          </a>
+        </div>
       </div>
-      <div class="w-full md:w-80 relative">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-sm"></i>
-        <input type="text" id="searchInput" placeholder="Buscar por nombre o marca..." 
-               class="w-full pl-9 pr-4 py-2 border rounded-full text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 transition">
+
+      <!-- Buscador y Redes en Desktop -->
+      <div class="flex items-center gap-4 w-full md:w-auto">
+        <div class="w-full md:w-80 relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-sm"></i>
+          <input type="text" id="searchInput" placeholder="Buscar por nombre o marca..." 
+                 class="w-full pl-9 pr-4 py-2 border rounded-full text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 transition">
+        </div>
+
+        <!-- Enlaces en Desktop -->
+        <div class="hidden md:flex items-center gap-2">
+          <a href="https://instagram.com/anluu.lg" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-50 text-pink-700 hover:bg-pink-100 border border-pink-200 text-xs font-bold transition">
+            <i class="fa-brands fa-instagram text-sm"></i> @anluu.lg
+          </a>
+        </div>
       </div>
+
     </div>
 
+    <!-- Filtros de categoría -->
     <div class="border-t border-gray-100 bg-white">
       <div class="max-w-6xl mx-auto px-4 flex gap-2 overflow-x-auto py-2.5 scrollbar-none">
         <button onclick="filterCategory('todos')" class="filter-btn active px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-900 text-white">Todos</button>
@@ -57,6 +79,7 @@
     </div>
   </header>
 
+  <!-- Contenedor Principal -->
   <main class="max-w-6xl mx-auto px-4 py-8 relative">
     
     <!-- Animación de Cargando... -->
@@ -72,6 +95,64 @@
     </div>
   </main>
 
+  <!-- Botón Flotante de WhatsApp Multicontacto -->
+  <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2">
+    <!-- Menú desplegable de números -->
+    <div id="waPopup" class="hidden bg-white shadow-2xl rounded-2xl p-4 border border-gray-100 w-64 mb-2 animate-fade-in transition-all">
+      <p class="text-xs font-black uppercase tracking-wider text-gray-400 mb-2">Escríbenos por WhatsApp</p>
+      <div class="space-y-2">
+        <a href="https://wa.me/584243306803?text=Hola%20ANLU%20Perfumes%2C%20quisiera%20hacer%20una%20consulta" target="_blank" class="flex items-center gap-3 p-2 rounded-xl hover:bg-green-50 transition border border-transparent hover:border-green-200">
+          <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center text-sm shadow-sm">
+            <i class="fa-brands fa-whatsapp"></i>
+          </div>
+          <div>
+            <span class="block text-xs font-bold text-gray-800">Atención 1</span>
+            <span class="block text-[11px] text-gray-500 font-medium">+58 424-3306803</span>
+          </div>
+        </a>
+
+        <a href="https://wa.me/584124596671?text=Hola%20ANLU%20Perfumes%2C%20quisiera%20hacer%20una%20consulta" target="_blank" class="flex items-center gap-3 p-2 rounded-xl hover:bg-green-50 transition border border-transparent hover:border-green-200">
+          <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center text-sm shadow-sm">
+            <i class="fa-brands fa-whatsapp"></i>
+          </div>
+          <div>
+            <span class="block text-xs font-bold text-gray-800">Atención 2</span>
+            <span class="block text-[11px] text-gray-500 font-medium">+58 412-4596671</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Botón redondo principal -->
+    <button onclick="toggleWaPopup()" class="bg-[#25D366] text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition flex items-center justify-center text-2xl focus:outline-none">
+      <i class="fa-brands fa-whatsapp"></i>
+    </button>
+  </div>
+
+  <!-- Footer con redes -->
+  <footer class="bg-white border-t border-gray-200 mt-12 py-8">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+      <div>
+        <h4 class="font-black text-gray-900 tracking-wider text-base">ANLU PARFUMS</h4>
+        <p class="text-xs text-gray-500 mt-0.5">Fragancias 100% originales y bajo encargo.</p>
+      </div>
+      <div class="flex flex-wrap justify-center items-center gap-4">
+        <a href="https://instagram.com/anluu.lg" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-pink-600 transition">
+          <i class="fa-brands fa-instagram text-base"></i> @anluu.lg
+        </a>
+        <span class="text-gray-300 hidden md:inline">•</span>
+        <a href="https://wa.me/584243306803" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-green-600 transition">
+          <i class="fa-brands fa-whatsapp text-base"></i> +58 424-3306803
+        </a>
+        <span class="text-gray-300 hidden md:inline">•</span>
+        <a href="https://wa.me/584124596671" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-green-600 transition">
+          <i class="fa-brands fa-whatsapp text-base"></i> +58 412-4596671
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal Detalle Perfume -->
   <div id="perfumeModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden p-4 backdrop-blur-sm">
     <div class="bg-white w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl relative max-h-[92vh] overflow-y-auto">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 text-2xl font-bold z-10">&times;</button>
@@ -80,13 +161,14 @@
   </div>
 
   <script>
-    // ⚠️ ATENCIÓN: Solo debes editar estas dos líneas de abajo ⚠️
-    const WHATSAPP_PHONE = "584243306803";
-    // Reemplaza TU_SHEET_ID_AQUI por el código que copiaste de la URL
     const SHEET_ID = "1kCqVj7HIP7oouLyOmwptYOmbXEuzQARgxvmit7EdsXw";
-const GID = "1819198756";
+    const GID = "1819198756";
+    const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&t=${Date.now()}`;
 
-const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&t=${Date.now()}`;
+    // Teléfono predeterminado para pedidos de la tarjeta (puedes cambiarlo si prefieres recibir los pedidos en el otro)
+    const PRIMARY_WA = "584243306803";
+    const SECONDARY_WA = "584124596671";
+    
     let perfumes = [];
     let currentCategory = "todos";
 
@@ -97,7 +179,11 @@ const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/t
     const searchInput = document.getElementById("searchInput");
     const loading = document.getElementById("loading");
 
-    // Función que asigna colores automáticos a los acordes
+    function toggleWaPopup() {
+      const popup = document.getElementById("waPopup");
+      popup.classList.toggle("hidden");
+    }
+
     function getAccordColor(name) {
       if (!name) return "#5D6D7E";
       const n = name.toLowerCase();
@@ -113,8 +199,7 @@ const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/t
       return "#5D6D7E"; 
     }
 
-    // Leer la base de datos evitando la memoria caché
-    Papa.parse(SHEET_CSV_URL + "&t=" + new Date().getTime(), {
+    Papa.parse(SHEET_CSV_URL, {
       download: true,
       header: true,
       complete: function(results) {
@@ -124,6 +209,7 @@ const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/t
           let cleanPrice = (row.Precio || "").toString().replace(/[^0-9.,]/g, "").replace(",", ".");
           let priceVal = parseFloat(cleanPrice);
           let priceStr = isNaN(priceVal) || priceVal === 0 ? "$0" : "$" + priceVal.toFixed(2);
+
           let accords = [];
           const widths = ["100%", "85%", "70%", "55%", "40%"];
           for(let i=1; i<=5; i++) {
@@ -153,7 +239,7 @@ const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/t
         applyFilters(); 
       },
       error: function(err) {
-        loading.innerHTML = '<p class="text-red-500 font-bold mt-4">Falta poner el enlace correcto del Excel en el código.</p>';
+        loading.innerHTML = '<p class="text-red-500 font-bold mt-4">Error al conectar con la base de datos de Google Sheets.</p>';
       }
     });
 
@@ -259,11 +345,19 @@ const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/t
             <span class="text-xs ${isPreorder ? 'text-blue-600' : 'text-gray-500'} uppercase font-semibold">${priceLabel}</span>
             <div class="text-2xl font-black ${isPreorder ? 'text-blue-700' : 'text-gray-900'}">${displayPrice}</div>
           </div>
-          <a href="https://wa.me/${WHATSAPP_PHONE}?text=${whatsappText}" 
-             target="_blank" 
-             class="w-full sm:w-auto bg-[#25D366] text-white px-6 py-3 rounded-xl font-bold text-sm hover:opacity-95 flex items-center justify-center gap-2 shadow-sm transition">
-            <i class="fa-brands fa-whatsapp text-lg"></i> ${isPreorder ? 'Encargar por WhatsApp' : 'Comprar por WhatsApp'}
-          </a>
+          
+          <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <a href="https://wa.me/${PRIMARY_WA}?text=${whatsappText}" 
+               target="_blank" 
+               class="bg-[#25D366] text-white px-5 py-2.5 rounded-xl font-bold text-xs hover:opacity-95 flex items-center justify-center gap-2 shadow-sm transition">
+              <i class="fa-brands fa-whatsapp text-base"></i> ${isPreorder ? 'Encargar (Opción 1)' : 'Comprar (Opción 1)'}
+            </a>
+            <a href="https://wa.me/${SECONDARY_WA}?text=${whatsappText}" 
+               target="_blank" 
+               class="bg-[#128C7E] text-white px-5 py-2.5 rounded-xl font-bold text-xs hover:opacity-95 flex items-center justify-center gap-2 shadow-sm transition">
+              <i class="fa-brands fa-whatsapp text-base"></i> ${isPreorder ? 'Encargar (Opción 2)' : 'Comprar (Opción 2)'}
+            </a>
+          </div>
         </div>
       `;
       modal.classList.remove("hidden");
@@ -292,7 +386,6 @@ const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/t
         return matchesCategory && matchesSearch;
       });
 
-      // Ordenar: Disponibles primero, Bajo Pedido al final
       filtered.sort((a, b) => {
         const aPreorder = a.price === "$0" || a.price === "$0.00";
         const bPreorder = b.price === "$0" || b.price === "$0.00";
