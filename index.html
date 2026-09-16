@@ -82,7 +82,11 @@
   <script>
     // ⚠️ ATENCIÓN: Solo debes editar estas dos líneas de abajo ⚠️
     const WHATSAPP_PHONE = "584243306803";
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS5AE2sLXFhZxsyvbxFAxTFIApUx2fsaxSArZ8JI1_cFxqhjpdCnc8haFrrSIFvbmpEJcxHTiXIHw4D/pub?gid=1819198756&single=true&output=csv"; 
+    // Reemplaza TU_SHEET_ID_AQUI por el código que copiaste de la URL
+    const SHEET_ID = "docs.google.com/spreadsheets/d/1kCqVj7HIP7oouLyOmwptYOmbXEuzQARgxvmit7EdsXw";
+    const GID = "1819198756"; // El ID de tu pestaña de inventario
+
+const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&t=${Date.now()}`;
     
     let perfumes = [];
     let currentCategory = "todos";
