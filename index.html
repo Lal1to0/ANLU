@@ -119,40 +119,52 @@
       </div>
     </div>
 
-    <!-- Botón Flotante Redondo de WhatsApp -->
-    <button onclick="toggleWaPopup()" class="bg-[#25D366] text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition flex items-center justify-center text-2xl focus:outline-none">
-      <i class="fa-brands fa-whatsapp"></i>
-    </button>
-  </div>
+   <!-- Botones Flotantes de Redes Sociales (Instagram + WhatsApp) -->
+  <div class="fixed bottom-5 right-5 z-40 flex flex-col items-center gap-3">
+    
+    <!-- Botón Flotante Redondo de Instagram -->
+    <a href="https://instagram.com/anluu.lg" target="_blank" 
+       class="w-14 h-14 rounded-full bg-gradient-to-tr from-yellow-500 via-pink-500 to-purple-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center text-2xl group relative"
+       title="Síguenos en Instagram">
+      <i class="fa-brands fa-instagram"></i>
+      <!-- Tooltip para PC -->
+      <span class="absolute right-16 bg-gray-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition whitespace-nowrap hidden md:block pointer-events-none">
+        @anluu.lg
+      </span>
+    </a>
 
-  <!-- Footer -->
-  <footer class="bg-white border-t border-gray-200 mt-12 py-8">
-    <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
-      <div>
-        <h4 class="font-black text-gray-900 tracking-wider text-base">ANLU PARFUMS</h4>
-        <p class="text-xs text-gray-500 mt-0.5">Fragancias 100% originales y bajo encargo.</p>
-      </div>
-      <div class="flex flex-wrap justify-center items-center gap-4">
-        <a href="https://instagram.com/anluu.lg" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-pink-600 transition">
-          <i class="fa-brands fa-instagram text-base"></i> @anluu.lg
-        </a>
-        <span class="text-gray-300 hidden md:inline">•</span>
-        <a href="https://wa.me/584243306803" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-green-600 transition">
-          <i class="fa-brands fa-whatsapp text-base"></i> +58 424-3306803
-        </a>
-        <span class="text-gray-300 hidden md:inline">•</span>
-        <a href="https://wa.me/584124596671" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-green-600 transition">
-          <i class="fa-brands fa-whatsapp text-base"></i> +58 412-4596671
-        </a>
-      </div>
-    </div>
-  </footer>
+    <!-- Contenedor relativo para el menú desplegable y botón de WhatsApp -->
+    <div class="relative flex flex-col items-center">
+      <!-- Menú Desplegable de WhatsApp -->
+      <div id="waPopup" class="hidden absolute bottom-16 right-0 bg-white shadow-2xl rounded-2xl p-4 border border-gray-100 w-64 animate-fade-in transition-all z-50">
+        <p class="text-xs font-black uppercase tracking-wider text-gray-400 mb-2">Escríbenos por WhatsApp</p>
+        <div class="space-y-2">
+          <a href="https://wa.me/584243306803?text=Hola%20ANLU%20Perfumes%2C%20quisiera%20hacer%20una%20consulta" target="_blank" class="flex items-center gap-3 p-2 rounded-xl hover:bg-green-50 transition border border-transparent hover:border-green-200">
+            <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center text-sm shadow-sm flex-shrink-0">
+              <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <div>
+              <span class="block text-xs font-bold text-gray-800">Atención 1</span>
+              <span class="block text-[11px] text-gray-500 font-medium">+58 424-3306803</span>
+            </div>
+          </a>
 
-  <!-- Modal Detalle Perfume -->
-  <div id="perfumeModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden p-4 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl relative max-h-[92vh] overflow-y-auto">
-      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 text-2xl font-bold z-10">&times;</button>
-      <div class="p-6 md:p-8" id="modalContent"></div>
+          <a href="https://wa.me/584124596671?text=Hola%20ANLU%20Perfumes%2C%20quisiera%20hacer%20una%20consulta" target="_blank" class="flex items-center gap-3 p-2 rounded-xl hover:bg-green-50 transition border border-transparent hover:border-green-200">
+            <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center text-sm shadow-sm flex-shrink-0">
+              <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <div>
+              <span class="block text-xs font-bold text-gray-800">Atención 2</span>
+              <span class="block text-[11px] text-gray-500 font-medium">+58 412-4596671</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Botón Flotante Redondo de WhatsApp -->
+      <button onclick="toggleWaPopup()" class="bg-[#25D366] text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition flex items-center justify-center text-2xl focus:outline-none">
+        <i class="fa-brands fa-whatsapp"></i>
+      </button>
     </div>
   </div>
 
