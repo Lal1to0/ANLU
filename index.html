@@ -4,10 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Catálogo ANLU Perfumes</title>
-<link rel="icon" type="image/png" href="favicon.png">
+  
+  <link rel="icon" type="image/png" href="123.png">
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Lector de Google Sheets (PapaParse) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  
   <style>
     .accord-bar {
       height: 22px;
@@ -29,12 +34,11 @@
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen">
 
-  <!-- Encabezado y Barra de Búsqueda -->
   <header class="bg-white shadow-sm sticky top-0 z-30">
     <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-     <!-- EL NUEVO CÓDIGO CON TU LOGO -->
       <div class="flex items-center">
-        <img src="1234.png" alt="ANLU Parfums" class="h-24 md:h-32 object-contain">
+        <!-- Tu Logo -->
+        <img src="1234.png" alt="ANLU Parfums" class="h-16 md:h-24 object-contain">
       </div>
       <div class="w-full md:w-80 relative">
         <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-sm"></i>
@@ -43,7 +47,6 @@
       </div>
     </div>
 
-    <!-- Pestañas de Secciones -->
     <div class="border-t border-gray-100 bg-white">
       <div class="max-w-6xl mx-auto px-4 flex gap-2 overflow-x-auto py-2.5 scrollbar-none">
         <button onclick="filterCategory('todos')" class="filter-btn active px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-900 text-white">Todos</button>
@@ -54,15 +57,21 @@
     </div>
   </header>
 
-  <!-- Grilla de Productos -->
-  <main class="max-w-6xl mx-auto px-4 py-8">
-    <div id="perfumesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+  <main class="max-w-6xl mx-auto px-4 py-8 relative">
+    
+    <!-- Animación de Cargando... -->
+    <div id="loading" class="text-center py-16">
+      <i class="fa-solid fa-spinner fa-spin text-4xl text-gray-400 mb-4"></i>
+      <p class="text-gray-500 font-medium text-lg">Cargando inventario...</p>
+    </div>
+
+    <div id="perfumesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 hidden"></div>
+    
     <div id="noResults" class="hidden text-center py-16">
       <p class="text-gray-500 font-medium text-lg">No encontramos perfumes que coincidan con tu búsqueda.</p>
     </div>
   </main>
 
-  <!-- Modal Estilo Fragrantica -->
   <div id="perfumeModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden p-4 backdrop-blur-sm">
     <div class="bg-white w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl relative max-h-[92vh] overflow-y-auto">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 text-2xl font-bold z-10">&times;</button>
@@ -71,37 +80,45 @@
   </div>
 
   <script>
-  const WHATSAPP_PHONE = "584243306803";
+    // ⚠️ ATENCIÓN: Solo debes editar estas dos líneas de abajo ⚠️
+    const WHATSAPP_PHONE = "584243306803";
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTF1eWG58HJqtCfJS2g-ULt94TLRlFC-MP4D4JhumExnma3fyj37QBZXCq36_dCvLsV8zvK0f8CW1fl/pub?gid=1905369199&single=true&output=csv"; 
+    // Recuerda que el enlace debe terminar en: /pub?output=csv
     
-    // PEGA TU ENLACE DE GOOGLE SHEETS AQUÍ ENTRE LAS COMILLAS
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTF1eWG58HJqtCfJS2g-ULt94TLRlFC-MP4D4JhumExnma3fyj37QBZXCq36_dCvLsV8zvK0f8CW1fl/pub?gid=1905369199&single=true&output=csv";
-
     let perfumes = [];
     let currentCategory = "todos";
 
-    // Herramienta inteligente para darle colores automáticos a los acordes
+    const grid = document.getElementById("perfumesGrid");
+    const noResults = document.getElementById("noResults");
+    const modal = document.getElementById("perfumeModal");
+    const modalContent = document.getElementById("modalContent");
+    const searchInput = document.getElementById("searchInput");
+    const loading = document.getElementById("loading");
+
+    // Función que asigna colores automáticos a los acordes
     function getAccordColor(name) {
+      if (!name) return "#5D6D7E";
       const n = name.toLowerCase();
       if(n.includes("cítrico") || n.includes("limón")) return "#F1C40F";
       if(n.includes("amaderado") || n.includes("madera") || n.includes("cuero")) return "#795548";
-      if(n.includes("dulce") || n.includes("avainillado") || n.includes("gourmand")) return "#D35400";
+      if(n.includes("dulce") || n.includes("avainillado") || n.includes("gourmand") || n.includes("caramelo")) return "#D35400";
       if(n.includes("acuático") || n.includes("fresco")) return "#3498DB";
       if(n.includes("frutado") || n.includes("tropical") || n.includes("frutal")) return "#E67E22";
       if(n.includes("floral") || n.includes("blanco") || n.includes("rosa")) return "#E91E63";
       if(n.includes("especiado") || n.includes("ambarado") || n.includes("ámbar")) return "#A04000";
       if(n.includes("verde") || n.includes("aromático") || n.includes("musgo")) return "#2ECC71";
       if(n.includes("almizclado") || n.includes("atalcado") || n.includes("lactónico")) return "#BDC3C7";
-      return "#5D6D7E"; // Color por defecto
+      return "#5D6D7E"; 
     }
 
-    // Leer la base de datos de Google Sheets
+    // Leer la base de datos
     Papa.parse(SHEET_CSV_URL, {
       download: true,
       header: true,
       complete: function(results) {
         const data = results.data;
         
-        perfumes = data.filter(row => row.Nombre).map(row => {
+        perfumes = data.filter(row => row.Nombre && row.Nombre.trim() !== "").map((row, index) => {
           let priceVal = parseFloat(row.Precio);
           let priceStr = isNaN(priceVal) || priceVal === 0 ? "$0" : "$" + priceVal.toFixed(2);
 
@@ -110,18 +127,18 @@
           for(let i=1; i<=5; i++) {
             let aName = row[`Acorde_${i}`];
             if(aName && aName.trim() !== "") {
-              accords.push({ name: aName, width: widths[i-1], color: getAccordColor(aName) });
+              accords.push({ name: aName.trim(), width: widths[i-1], color: getAccordColor(aName) });
             }
           }
 
           return {
-            id: row.ID,
-            name: row.Nombre,
-            brand: row.Marca,
-            gender: row.Género ? row.Género.toLowerCase() : "unisex",
+            id: index + 1,
+            name: row.Nombre.trim(),
+            brand: (row.Marca || "").trim(),
+            gender: (row.Género || "unisex").trim().toLowerCase(),
             price: priceStr,
-            image: row.Imagen_URL,
-            concentration: row.Concentración,
+            image: (row.Imagen_URL || "").trim(),
+            concentration: (row.Concentración || "").trim(),
             accords: accords,
             topNotes: row.Notas_Salida ? row.Notas_Salida.split(',').map(s=>s.trim()) : [],
             heartNotes: row.Notas_Corazón ? row.Notas_Corazón.split(',').map(s=>s.trim()) : [],
@@ -129,19 +146,16 @@
           };
         });
         
-        applyFilters(); // Mostrar los perfumes una vez cargados
+        loading.classList.add("hidden");
+        grid.classList.remove("hidden");
+        applyFilters(); 
+      },
+      error: function(err) {
+        loading.innerHTML = '<p class="text-red-500 font-bold mt-4">Falta poner el enlace correcto del Excel en el código.</p>';
       }
     });
 
-    // ... A CONTINUACIÓN, DEJA TUS FUNCIONES renderCards, openModal, closeModal, filterCategory y applyFilters INTACTAS ...
-    let currentCategory = "todos";
-    const grid = document.getElementById("perfumesGrid");
-    const noResults = document.getElementById("noResults");
-    const modal = document.getElementById("perfumeModal");
-    const modalContent = document.getElementById("modalContent");
-    const searchInput = document.getElementById("searchInput");
-
-function renderCards(data) {
+    function renderCards(data) {
       if (data.length === 0) {
         grid.innerHTML = "";
         noResults.classList.remove("hidden");
@@ -150,21 +164,20 @@ function renderCards(data) {
       noResults.classList.add("hidden");
 
       grid.innerHTML = data.map(p => {
-        // Lógica para detectar si el precio es cero
         const isPreorder = p.price === "$0" || p.price === "$0.00";
         const displayPrice = isPreorder ? "ENCARGAR" : p.price;
         const priceClass = isPreorder ? "text-blue-600 text-sm tracking-widest" : "text-gray-900 text-lg";
 
-        // Lógica para la etiqueta (Azul si es encargo, Verde si está disponible)
         const badgeHTML = isPreorder 
           ? '<span class="absolute top-3 right-3 bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Bajo Pedido</span>'
           : '<span class="absolute top-3 right-3 bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Disponible</span>';
 
+        // Si una imagen está rota o vacía, pone una de repuesto
         return `
         <div onclick="openModal(${p.id})" class="bg-white rounded-xl shadow-sm hover:shadow-xl transition duration-200 cursor-pointer overflow-hidden border border-gray-200 flex flex-col justify-between group">
           <div class="h-64 flex items-center justify-center p-4 bg-gray-50/70 group-hover:bg-white transition relative">
             ${badgeHTML}
-            <img src="${p.image}" alt="${p.name}" class="h-full object-contain group-hover:scale-105 transition duration-300">
+            <img src="${p.image}" alt="${p.name}" class="h-full object-contain group-hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/300x400?text=ANLU'">
           </div>
           <div class="p-4 flex flex-col justify-between flex-1">
             <div>
@@ -191,7 +204,6 @@ function renderCards(data) {
       const p = perfumes.find(item => item.id === id);
       if (!p) return;
 
-      // Lógica para el modal y el mensaje de WhatsApp
       const isPreorder = p.price === "$0" || p.price === "$0.00";
       const displayPrice = isPreorder ? "ENCARGAR" : p.price;
       const priceLabel = isPreorder ? "Disponibilidad" : "Precio";
@@ -208,7 +220,7 @@ function renderCards(data) {
         <div class="flex flex-col md:flex-row gap-6 items-center md:items-start mb-6">
           <div class="w-48 h-48 flex items-center justify-center bg-gray-50 rounded-xl border p-2 flex-shrink-0 relative">
             ${badgeHTML}
-            <img src="${p.image}" class="max-h-full max-w-full object-contain">
+            <img src="${p.image}" class="max-h-full max-w-full object-contain" onerror="this.src='https://via.placeholder.com/300x400?text=ANLU'">
           </div>
           <div class="flex-1 w-full">
             <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">${p.brand}</span>
@@ -255,7 +267,7 @@ function renderCards(data) {
       `;
       modal.classList.remove("hidden");
     }
-    
+
     function closeModal() {
       modal.classList.add("hidden");
     }
@@ -285,9 +297,6 @@ function renderCards(data) {
     modal.addEventListener("click", (e) => {
       if (e.target === modal) closeModal();
     });
-
-    // Carga inicial
-    renderCards(perfumes);
   </script>
 </body>
 </html>
