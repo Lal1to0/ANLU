@@ -59,6 +59,8 @@
         <button onclick="filterCategory('hombre')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Hombre</button>
         <button onclick="filterCategory('mujer')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Mujer</button>
         <button onclick="filterCategory('unisex')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Unisex</button>
+        <!-- NUEVO BOTÓN SPLASH -->
+        <button onclick="filterCategory('splash')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Splash</button>
       </div>
     </div>
   </header>
@@ -299,6 +301,7 @@
                 <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
                   p.gender === 'hombre' ? 'bg-blue-50 text-blue-600 border border-blue-200' :
                   p.gender === 'mujer' ? 'bg-pink-50 text-pink-600 border border-pink-200' :
+                  p.gender === 'splash' ? 'bg-teal-50 text-teal-600 border border-teal-200' :
                   'bg-purple-50 text-purple-600 border border-purple-200'
                 }">${p.gender}</span>
               </div>
