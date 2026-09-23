@@ -198,22 +198,53 @@
       return "#5D6D7E"; 
     }
 
-    // Función que consulta Google Sheets
+    // Función que consulta Google Sheets de forma inteligente (SIN el problema de headers=8)
     function cargarDatos(esSilencioso = false) {
-      // AQUÍ ESTÁ EL AJUSTE (headers=8)
-      const urlConAntiCache = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv;headers=8&gid=${GID}&t=${Date.now()}`;
+      const urlConAntiCache = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&t=${Date.now()}`;
 
       Papa.parse(urlConAntiCache, {
         download: true,
-        header: true,
+        header: false, // Leemos los datos en bruto para armar las columnas nosotros mismos
         complete: function(results) {
-          const data = results.data;
+          const rawData = results.data;
           
+          // Buscar en qué fila exacta están los títulos "Nombre", "Precio" y "Stock"
+          let headerIndex = -1;
+          for (let i = 0; i < rawData.length; i++) {
+            const rowText = rawData[i].join(" ").toLowerCase();
+            if (rowText.includes("nombre") && rowText.includes("precio") && rowText.includes("stock")) {
+              headerIndex = i;
+              break;
+            }
+          }
+
+          if (headerIndex === -1) {
+            if (!esSilencioso) {
+              loading.innerHTML = '<p class="text-red-500 font-bold mt-4">Error: No se encontraron los títulos de las columnas (Nombre, Precio, Stock).</p>';
+            }
+            return;
+          }
+
+          // Extraer los nombres de las columnas limpiando espacios
+          const headers = rawData[headerIndex].map(h => h ? h.trim() : "");
+          const rows = rawData.slice(headerIndex + 1);
+          
+          // Unir cada dato con el nombre de su columna (Ej: Precio -> 20)
+          const data = rows.map(rowArray => {
+            let rowObj = {};
+            headers.forEach((header, index) => {
+              if (header) {
+                rowObj[header] = rowArray[index];
+              }
+            });
+            return rowObj;
+          });
+          
+          // Procesar los perfumes
           const nuevosPerfumes = data.filter(row => row.Nombre && row.Nombre.trim() !== "").map((row, index) => {
             let cleanPrice = (row.Precio || "").toString().replace(/[^0-9.,]/g, "").replace(",", ".");
             let priceVal = parseFloat(cleanPrice);
 
-            // Lectura de stock segura: si no viene o está vacío, asume 1; si es 0, pasa a Bajo Pedido
             let stockRaw = (row.Stock !== undefined && row.Stock !== null) ? row.Stock.toString().trim() : "1";
             let stockVal = parseInt(stockRaw, 10);
             if (isNaN(stockVal)) stockVal = 1;
