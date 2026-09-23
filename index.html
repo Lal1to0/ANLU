@@ -59,7 +59,6 @@
         <button onclick="filterCategory('hombre')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Hombre</button>
         <button onclick="filterCategory('mujer')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Mujer</button>
         <button onclick="filterCategory('unisex')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Unisex</button>
-        <!-- NUEVO BOTÓN SPLASH -->
         <button onclick="filterCategory('splash')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Splash</button>
       </div>
     </div>
@@ -198,85 +197,78 @@
       return "#5D6D7E"; 
     }
 
-    // Función que consulta Google Sheets de forma inteligente (SIN el problema de headers=8)
+    // Función que consulta Google Sheets por Posición (Método Blindado)
     function cargarDatos(esSilencioso = false) {
       const urlConAntiCache = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&t=${Date.now()}`;
 
       Papa.parse(urlConAntiCache, {
         download: true,
-        header: false, // Leemos los datos en bruto para armar las columnas nosotros mismos
+        header: false, // Apagamos la búsqueda de títulos. Leeremos por número de columna.
         complete: function(results) {
           const rawData = results.data;
+          let nuevosPerfumes = [];
           
-          // Buscar en qué fila exacta están los títulos "Nombre", "Precio" y "Stock"
-          let headerIndex = -1;
-          for (let i = 0; i < rawData.length; i++) {
-            const rowText = rawData[i].join(" ").toLowerCase();
-            if (rowText.includes("nombre") && rowText.includes("precio") && rowText.includes("stock")) {
-              headerIndex = i;
-              break;
-            }
-          }
+          // Recorremos TODAS las filas del documento
+          rawData.forEach((row, index) => {
+            // Si la fila está vacía, o su primera columna dice "Nombre" (es la fila de tus títulos), la saltamos
+            if (!row || row.length < 5 || !row[0] || row[0].trim().toLowerCase() === "nombre") return;
 
-          if (headerIndex === -1) {
-            if (!esSilencioso) {
-              loading.innerHTML = '<p class="text-red-500 font-bold mt-4">Error: No se encontraron los títulos de las columnas (Nombre, Precio, Stock).</p>';
-            }
-            return;
-          }
+            // Asignamos los datos por su posición exacta en las columnas (0 es la primera columna)
+            let nombre = row[0] ? row[0].trim() : "";
+            let marca = row[1] ? row[1].trim() : "";
+            let genero = row[2] ? row[2].trim().toLowerCase() : "unisex";
+            let precioCrudo = row[3] ? row[3].toString() : "";
+            let stockCrudo = row[4] ? row[4].toString() : "1";
+            let imagen = row[5] ? row[5].trim() : "";
+            let concentracion = row[6] ? row[6].trim() : "";
+            
+            // Si la celda del nombre está vacía, no es un perfume, la saltamos
+            if (nombre === "") return;
 
-          // Extraer los nombres de las columnas limpiando espacios
-          const headers = rawData[headerIndex].map(h => h ? h.trim() : "");
-          const rows = rawData.slice(headerIndex + 1);
-          
-          // Unir cada dato con el nombre de su columna (Ej: Precio -> 20)
-          const data = rows.map(rowArray => {
-            let rowObj = {};
-            headers.forEach((header, index) => {
-              if (header) {
-                rowObj[header] = rowArray[index];
-              }
-            });
-            return rowObj;
-          });
-          
-          // Procesar los perfumes
-          const nuevosPerfumes = data.filter(row => row.Nombre && row.Nombre.trim() !== "").map((row, index) => {
-            let cleanPrice = (row.Precio || "").toString().replace(/[^0-9.,]/g, "").replace(",", ".");
+            // Limpiamos y procesamos el Precio
+            let cleanPrice = precioCrudo.replace(/[^0-9.,]/g, "").replace(",", ".");
             let priceVal = parseFloat(cleanPrice);
 
-            let stockRaw = (row.Stock !== undefined && row.Stock !== null) ? row.Stock.toString().trim() : "1";
-            let stockVal = parseInt(stockRaw, 10);
+            // Limpiamos y procesamos el Stock
+            let stockVal = parseInt(stockCrudo, 10);
             if (isNaN(stockVal)) stockVal = 1;
 
+            // Lógica de disponibilidad
             let isOutOfStock = stockVal <= 0;
             let priceStr = (isNaN(priceVal) || priceVal === 0 || isOutOfStock) ? "$0" : "$" + priceVal.toFixed(2);
 
+            // Procesamos los Acordes (Están en las columnas 7 a la 11)
             let accords = [];
             const widths = ["100%", "85%", "70%", "55%", "40%"];
-            for(let i=1; i<=5; i++) {
-              let aName = row[`Acorde_${i}`];
+            for(let i=0; i<5; i++) {
+              let aName = row[7 + i];
               if(aName && aName.trim() !== "") {
-                accords.push({ name: aName.trim(), width: widths[i-1], color: getAccordColor(aName) });
+                accords.push({ name: aName.trim(), width: widths[i], color: getAccordColor(aName) });
               }
             }
 
-            return {
-              id: index + 1,
-              name: row.Nombre.trim(),
-              brand: (row.Marca || "").trim(),
-              gender: (row.Género || "unisex").trim().toLowerCase(),
+            // Procesamos las Notas Olfativas (Están en las columnas 12 a la 14)
+            let topNotes = row[12] ? row[12].split(',').map(s=>s.trim()) : [];
+            let heartNotes = row[13] ? row[13].split(',').map(s=>s.trim()) : [];
+            let baseNotes = row[14] ? row[14].split(',').map(s=>s.trim()) : [];
+
+            // Guardamos el perfume armado en nuestra lista
+            nuevosPerfumes.push({
+              id: index + 1, // Le damos un ID interno único
+              name: nombre,
+              brand: marca,
+              gender: genero,
               price: priceStr,
-              image: (row.Imagen_URL || "").trim(),
-              concentration: (row.Concentración || "").trim(),
+              image: imagen,
+              concentration: concentracion,
               accords: accords,
-              topNotes: row.Notas_Salida ? row.Notas_Salida.split(',').map(s=>s.trim()) : [],
-              heartNotes: row.Notas_Corazón ? row.Notas_Corazón.split(',').map(s=>s.trim()) : [],
-              baseNotes: row.Notas_Fondo ? row.Notas_Fondo.split(',').map(s=>s.trim()) : []
-            };
+              topNotes: topNotes,
+              heartNotes: heartNotes,
+              baseNotes: baseNotes
+            });
           });
 
-          // Solo actualiza la pantalla si la lista de perfumes cambió
+          // Solo recargamos la pantalla si descubrimos algún cambio en los inventarios
           if (JSON.stringify(nuevosPerfumes) !== JSON.stringify(perfumes)) {
             perfumes = nuevosPerfumes;
             applyFilters();
