@@ -198,21 +198,49 @@
       return "#5D6D7E"; 
     }
 
-    // Función que consulta Google Sheets
+    // Función que consulta Google Sheets de forma inteligente
     function cargarDatos(esSilencioso = false) {
-   const urlConAntiCache = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}&range=A9:Z&t=${Date.now()}`;
-     
+      const urlConAntiCache = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&t=${Date.now()}`;
+
       Papa.parse(urlConAntiCache, {
         download: true,
-        header: true,
+        header: false, // Desactivamos lectura automática para encontrar la fila real
         complete: function(results) {
-          const data = results.data;
+          const rawData = results.data;
           
+          // Buscar dinámicamente la fila de encabezados
+          let headerIndex = -1;
+          for (let i = 0; i < rawData.length; i++) {
+            if (rawData[i] && rawData[i].includes("Nombre") && rawData[i].includes("Precio")) {
+              headerIndex = i;
+              break;
+            }
+          }
+
+          if (headerIndex === -1) {
+            if (!esSilencioso) {
+              loading.innerHTML = '<p class="text-red-500 font-bold mt-4">Error: No se encontraron los títulos de las columnas (Nombre, Precio).</p>';
+            }
+            return;
+          }
+
+          // Extraer encabezados y datos reales
+          const headers = rawData[headerIndex];
+          const rows = rawData.slice(headerIndex + 1);
+          
+          const data = rows.map(rowArray => {
+            let rowObj = {};
+            headers.forEach((header, index) => {
+              if (header) rowObj[header.trim()] = rowArray[index];
+            });
+            return rowObj;
+          });
+          
+          // Procesar los datos
           const nuevosPerfumes = data.filter(row => row.Nombre && row.Nombre.trim() !== "").map((row, index) => {
             let cleanPrice = (row.Precio || "").toString().replace(/[^0-9.,]/g, "").replace(",", ".");
             let priceVal = parseFloat(cleanPrice);
 
-            // Lectura de stock segura: si no viene o está vacío, asume 1; si es 0, pasa a Bajo Pedido
             let stockRaw = (row.Stock !== undefined && row.Stock !== null) ? row.Stock.toString().trim() : "1";
             let stockVal = parseInt(stockRaw, 10);
             if (isNaN(stockVal)) stockVal = 1;
