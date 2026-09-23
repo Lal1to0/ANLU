@@ -200,7 +200,7 @@
 
     // Función que consulta Google Sheets
     function cargarDatos(esSilencioso = false) {
-     const urlConAntiCache = '[https://docs.google.com/spreadsheets/d/$](https://docs.google.com/spreadsheets/d/$){SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&range=A9:Z&t=${Date.now()}';
+     const urlConAntiCache = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&range=A9:Z&t=${Date.now()}`;
     
       Papa.parse(urlConAntiCache, {
         download: true,
