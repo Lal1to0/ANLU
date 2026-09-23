@@ -210,17 +210,17 @@
           
           // Recorremos TODAS las filas del documento
           rawData.forEach((row, index) => {
-            // Si la fila está vacía, o su primera columna dice "Nombre" (es la fila de tus títulos), la saltamos
-            if (!row || row.length < 5 || !row[0] || row[0].trim().toLowerCase() === "nombre") return;
+            // Si la fila está vacía, o su segunda columna (índice 1) dice "Nombre", la saltamos
+            if (!row || row.length < 5 || !row[1] || row[1].trim().toLowerCase() === "nombre") return;
 
-            // Asignamos los datos por su posición exacta en las columnas (0 es la primera columna)
-            let nombre = row[0] ? row[0].trim() : "";
-            let marca = row[1] ? row[1].trim() : "";
-            let genero = row[2] ? row[2].trim().toLowerCase() : "unisex";
-            let precioCrudo = row[3] ? row[3].toString() : "";
-            let stockCrudo = row[4] ? row[4].toString() : "1";
-            let imagen = row[5] ? row[5].trim() : "";
-            let concentracion = row[6] ? row[6].trim() : "";
+            // Asignamos los datos por su posición EXACTA en tu hoja
+            let nombre = row[1] ? row[1].trim() : "";           // Columna B (Nombre)
+            let marca = row[2] ? row[2].trim() : "";            // Columna C (Marca)
+            let genero = row[3] ? row[3].trim().toLowerCase() : "unisex"; // Columna D (Género)
+            let precioCrudo = row[4] ? row[4].toString() : "";  // Columna E (Precio)
+            let stockCrudo = row[5] ? row[5].toString() : "1";  // Columna F (Stock)
+            let imagen = row[6] ? row[6].trim() : "";           // Columna G (Imagen_URL)
+            let concentracion = row[7] ? row[7].trim() : "";    // Columna H (Concentración)
             
             // Si la celda del nombre está vacía, no es un perfume, la saltamos
             if (nombre === "") return;
@@ -237,20 +237,20 @@
             let isOutOfStock = stockVal <= 0;
             let priceStr = (isNaN(priceVal) || priceVal === 0 || isOutOfStock) ? "$0" : "$" + priceVal.toFixed(2);
 
-            // Procesamos los Acordes (Están en las columnas 7 a la 11)
+            // Procesamos los Acordes (Están en las columnas 8 a la 12, letras I a M)
             let accords = [];
             const widths = ["100%", "85%", "70%", "55%", "40%"];
             for(let i=0; i<5; i++) {
-              let aName = row[7 + i];
+              let aName = row[8 + i];
               if(aName && aName.trim() !== "") {
                 accords.push({ name: aName.trim(), width: widths[i], color: getAccordColor(aName) });
               }
             }
 
-            // Procesamos las Notas Olfativas (Están en las columnas 12 a la 14)
-            let topNotes = row[12] ? row[12].split(',').map(s=>s.trim()) : [];
-            let heartNotes = row[13] ? row[13].split(',').map(s=>s.trim()) : [];
-            let baseNotes = row[14] ? row[14].split(',').map(s=>s.trim()) : [];
+            // Procesamos las Notas Olfativas (Están en las columnas 13 a la 15, letras N a P)
+            let topNotes = row[13] ? row[13].split(',').map(s=>s.trim()) : [];
+            let heartNotes = row[14] ? row[14].split(',').map(s=>s.trim()) : [];
+            let baseNotes = row[15] ? row[15].split(',').map(s=>s.trim()) : [];
 
             // Guardamos el perfume armado en nuestra lista
             nuevosPerfumes.push({
