@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="transition-colors duration-300">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,21 @@
   
   <link rel="icon" type="image/png" href="favicon.png">
 
+  <!-- Configuración previa para evitar parpadeos blancos en Modo Oscuro -->
+  <script>
+    if (localStorage.getItem('temaANLU') === 'oscuro' || (!('temaANLU' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Habilitar Modo Oscuro en Tailwind -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Lector de Google Sheets (PapaParse) -->
@@ -32,10 +46,10 @@
     }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-16">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans min-h-screen pb-16 transition-colors duration-300">
 
   <!-- Header -->
-  <header class="bg-white shadow-sm sticky top-0 z-30">
+  <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-30 transition-colors duration-300">
     <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
       
       <!-- Logo -->
@@ -43,23 +57,31 @@
         <img src="1234.png" alt="ANLU Parfums" class="h-14 md:h-36 object-contain">
       </div>
 
-      <!-- Buscador -->
-      <div class="w-full md:w-80 relative">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-sm"></i>
-        <input type="text" id="searchInput" placeholder="Buscar por nombre o marca..." 
-               class="w-full pl-9 pr-4 py-2 border rounded-full text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 transition">
+      <!-- Buscador y Botón Tema -->
+      <div class="flex w-full md:w-auto items-center gap-2">
+        <div class="w-full md:w-80 relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 dark:text-gray-500 text-sm"></i>
+          <input type="text" id="searchInput" placeholder="Buscar por nombre o marca..." 
+                 class="w-full pl-9 pr-4 py-2 border dark:border-gray-600 rounded-full text-sm bg-gray-50 dark:bg-gray-700 dark:text-white focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 transition">
+        </div>
+        
+        <!-- Botón Modo Oscuro/Claro -->
+        <button id="btnDarkMode" class="w-10 h-10 flex-shrink-0 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition" title="Cambiar tema">
+          <i class="fa-solid fa-moon block dark:hidden"></i>
+          <i class="fa-solid fa-sun hidden dark:block"></i>
+        </button>
       </div>
 
     </div>
 
     <!-- Filtros de categoría -->
-    <div class="border-t border-gray-100 bg-white">
+    <div class="border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors duration-300">
       <div class="max-w-6xl mx-auto px-4 flex gap-2 overflow-x-auto py-2.5 scrollbar-none">
-        <button onclick="filterCategory('todos')" class="filter-btn active px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-900 text-white">Todos</button>
-        <button onclick="filterCategory('hombre')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Hombre</button>
-        <button onclick="filterCategory('mujer')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Mujer</button>
-        <button onclick="filterCategory('unisex')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Unisex</button>
-        <button onclick="filterCategory('splash')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Splash</button>
+        <button onclick="filterCategory('todos')" class="filter-btn active px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-900 dark:bg-white text-white dark:text-gray-900">Todos</button>
+        <button onclick="filterCategory('hombre')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">Hombre</button>
+        <button onclick="filterCategory('mujer')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">Mujer</button>
+        <button onclick="filterCategory('unisex')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">Unisex</button>
+        <button onclick="filterCategory('splash')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">Splash</button>
       </div>
     </div>
   </header>
@@ -69,14 +91,14 @@
     
     <!-- Animación de Cargando... -->
     <div id="loading" class="text-center py-16">
-      <i class="fa-solid fa-spinner fa-spin text-4xl text-gray-400 mb-4"></i>
-      <p class="text-gray-500 font-medium text-lg">Cargando inventario...</p>
+      <i class="fa-solid fa-spinner fa-spin text-4xl text-gray-400 dark:text-gray-500 mb-4"></i>
+      <p class="text-gray-500 dark:text-gray-400 font-medium text-lg">Cargando inventario...</p>
     </div>
 
     <div id="perfumesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 hidden"></div>
     
     <div id="noResults" class="hidden text-center py-16">
-      <p class="text-gray-500 font-medium text-lg">No encontramos perfumes que coincidan con tu búsqueda.</p>
+      <p class="text-gray-500 dark:text-gray-400 font-medium text-lg">No encontramos perfumes que coincidan con tu búsqueda.</p>
     </div>
   </main>
 
@@ -88,8 +110,7 @@
        class="w-14 h-14 rounded-full bg-gradient-to-tr from-yellow-500 via-pink-500 to-purple-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center text-2xl group relative"
        title="Síguenos en Instagram">
       <i class="fa-brands fa-instagram"></i>
-      <!-- Tooltip para PC -->
-      <span class="absolute right-16 bg-gray-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition whitespace-nowrap hidden md:block pointer-events-none">
+      <span class="absolute right-16 bg-gray-900 dark:bg-white dark:text-gray-900 text-white text-xs px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition whitespace-nowrap hidden md:block pointer-events-none">
         @anluu.lg
       </span>
     </a>
@@ -97,26 +118,26 @@
     <!-- Contenedor relativo para el menú desplegable y botón de WhatsApp -->
     <div class="relative flex flex-col items-center">
       <!-- Menú Desplegable de WhatsApp -->
-      <div id="waPopup" class="hidden absolute bottom-16 right-0 bg-white shadow-2xl rounded-2xl p-4 border border-gray-100 w-64 animate-fade-in transition-all z-50">
-        <p class="text-xs font-black uppercase tracking-wider text-gray-400 mb-2">Escríbenos por WhatsApp</p>
+      <div id="waPopup" class="hidden absolute bottom-16 right-0 bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-4 border border-gray-100 dark:border-gray-700 w-64 animate-fade-in transition-all z-50">
+        <p class="text-xs font-black uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">Escríbenos por WhatsApp</p>
         <div class="space-y-2">
-          <a href="https://wa.me/584243306803?text=Hola%20ANLU%20Perfumes%2C%20quisiera%20hacer%20una%20consulta" target="_blank" class="flex items-center gap-3 p-2 rounded-xl hover:bg-green-50 transition border border-transparent hover:border-green-200">
+          <a href="https://wa.me/584243306803?text=Hola%20ANLU%20Perfumes%2C%20quisiera%20hacer%20una%20consulta" target="_blank" class="flex items-center gap-3 p-2 rounded-xl hover:bg-green-50 dark:hover:bg-gray-700 transition border border-transparent hover:border-green-200 dark:hover:border-gray-600">
             <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center text-sm shadow-sm flex-shrink-0">
               <i class="fa-brands fa-whatsapp"></i>
             </div>
             <div>
-              <span class="block text-xs font-bold text-gray-800">Atención 1</span>
-              <span class="block text-[11px] text-gray-500 font-medium">+58 424-3306803</span>
+              <span class="block text-xs font-bold text-gray-800 dark:text-gray-200">Atención 1</span>
+              <span class="block text-[11px] text-gray-500 dark:text-gray-400 font-medium">+58 424-3306803</span>
             </div>
           </a>
 
-          <a href="https://wa.me/584124596671?text=Hola%20ANLU%20Perfumes%2C%20quisiera%20hacer%20una%20consulta" target="_blank" class="flex items-center gap-3 p-2 rounded-xl hover:bg-green-50 transition border border-transparent hover:border-green-200">
+          <a href="https://wa.me/584124596671?text=Hola%20ANLU%20Perfumes%2C%20quisiera%20hacer%20una%20consulta" target="_blank" class="flex items-center gap-3 p-2 rounded-xl hover:bg-green-50 dark:hover:bg-gray-700 transition border border-transparent hover:border-green-200 dark:hover:border-gray-600">
             <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center text-sm shadow-sm flex-shrink-0">
               <i class="fa-brands fa-whatsapp"></i>
             </div>
             <div>
-              <span class="block text-xs font-bold text-gray-800">Atención 2</span>
-              <span class="block text-[11px] text-gray-500 font-medium">+58 412-4596671</span>
+              <span class="block text-xs font-bold text-gray-800 dark:text-gray-200">Atención 2</span>
+              <span class="block text-[11px] text-gray-500 dark:text-gray-400 font-medium">+58 412-4596671</span>
             </div>
           </a>
         </div>
@@ -129,31 +150,31 @@
     </div>
   </div>
 
-  <!-- Modal Detalle Perfume (Notas y Compra) -->
-  <div id="perfumeModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden p-4 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl relative max-h-[92vh] overflow-y-auto">
-      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 text-2xl font-bold z-10">&times;</button>
+  <!-- Modal Detalle Perfume -->
+  <div id="perfumeModal" class="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center hidden p-4 backdrop-blur-sm transition-colors duration-300">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl relative max-h-[92vh] overflow-y-auto border border-transparent dark:border-gray-700 transition-colors duration-300">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 dark:hover:text-white text-2xl font-bold z-10">&times;</button>
       <div class="p-6 md:p-8" id="modalContent"></div>
     </div>
   </div>
 
   <!-- Footer -->
-  <footer class="bg-white border-t border-gray-200 mt-12 py-8">
+  <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12 py-8 transition-colors duration-300">
     <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
       <div>
-        <h4 class="font-black text-gray-900 tracking-wider text-base">ANLU PARFUMS</h4>
-        <p class="text-xs text-gray-500 mt-0.5">Fragancias 100% originales y bajo encargo.</p>
+        <h4 class="font-black text-gray-900 dark:text-white tracking-wider text-base">ANLU PARFUMS</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Fragancias 100% originales y bajo encargo.</p>
       </div>
       <div class="flex flex-wrap justify-center items-center gap-4">
-        <a href="https://instagram.com/anluu.lg" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-pink-600 transition">
+        <a href="https://instagram.com/anluu.lg" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition">
           <i class="fa-brands fa-instagram text-base"></i> @anluu.lg
         </a>
-        <span class="text-gray-300 hidden md:inline">•</span>
-        <a href="https://wa.me/584243306803" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-green-600 transition">
+        <span class="text-gray-300 dark:text-gray-600 hidden md:inline">•</span>
+        <a href="https://wa.me/584243306803" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition">
           <i class="fa-brands fa-whatsapp text-base"></i> +58 424-3306803
         </a>
-        <span class="text-gray-300 hidden md:inline">•</span>
-        <a href="https://wa.me/584124596671" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-green-600 transition">
+        <span class="text-gray-300 dark:text-gray-600 hidden md:inline">•</span>
+        <a href="https://wa.me/584124596671" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition">
           <i class="fa-brands fa-whatsapp text-base"></i> +58 412-4596671
         </a>
       </div>
@@ -161,6 +182,22 @@
   </footer>
 
   <script>
+    // ==========================================
+    // LÓGICA MODO OSCURO
+    // ==========================================
+    const btnDarkMode = document.getElementById('btnDarkMode');
+    const htmlElement = document.documentElement;
+
+    btnDarkMode.addEventListener('click', () => {
+      htmlElement.classList.toggle('dark');
+      if (htmlElement.classList.contains('dark')) {
+        localStorage.setItem('temaANLU', 'oscuro');
+      } else {
+        localStorage.setItem('temaANLU', 'claro');
+      }
+    });
+    // ==========================================
+
     const SHEET_ID = "1kCqVj7HIP7oouLyOmwptYOmbXEuzQARgxvmit7EdsXw";
     const GID = "1819198756";
 
@@ -197,47 +234,38 @@
       return "#5D6D7E"; 
     }
 
-    // Función que consulta Google Sheets por Posición (Método Blindado)
     function cargarDatos(esSilencioso = false) {
       const urlConAntiCache = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&t=${Date.now()}`;
 
       Papa.parse(urlConAntiCache, {
         download: true,
-        header: false, // Apagamos la búsqueda de títulos. Leeremos por número de columna.
+        header: false,
         complete: function(results) {
           const rawData = results.data;
           let nuevosPerfumes = [];
           
-          // Recorremos TODAS las filas del documento
           rawData.forEach((row, index) => {
-            // Si la fila está vacía, o su segunda columna (índice 1) dice "Nombre", la saltamos
             if (!row || row.length < 5 || !row[1] || row[1].trim().toLowerCase() === "nombre") return;
 
-            // Asignamos los datos por su posición EXACTA en tu hoja
-            let nombre = row[1] ? row[1].trim() : "";           // Columna B (Nombre)
-            let marca = row[2] ? row[2].trim() : "";            // Columna C (Marca)
-            let genero = row[3] ? row[3].trim().toLowerCase() : "unisex"; // Columna D (Género)
-            let precioCrudo = row[4] ? row[4].toString() : "";  // Columna E (Precio)
-            let stockCrudo = row[5] ? row[5].toString() : "1";  // Columna F (Stock)
-            let imagen = row[6] ? row[6].trim() : "";           // Columna G (Imagen_URL)
-            let concentracion = row[7] ? row[7].trim() : "";    // Columna H (Concentración)
+            let nombre = row[1] ? row[1].trim() : "";
+            let marca = row[2] ? row[2].trim() : "";
+            let genero = row[3] ? row[3].trim().toLowerCase() : "unisex";
+            let precioCrudo = row[4] ? row[4].toString() : "";
+            let stockCrudo = row[5] ? row[5].toString() : "1";
+            let imagen = row[6] ? row[6].trim() : "";
+            let concentracion = row[7] ? row[7].trim() : "";
             
-            // Si la celda del nombre está vacía, no es un perfume, la saltamos
             if (nombre === "") return;
 
-            // Limpiamos y procesamos el Precio
             let cleanPrice = precioCrudo.replace(/[^0-9.,]/g, "").replace(",", ".");
             let priceVal = parseFloat(cleanPrice);
 
-            // Limpiamos y procesamos el Stock
             let stockVal = parseInt(stockCrudo, 10);
             if (isNaN(stockVal)) stockVal = 1;
 
-            // Lógica de disponibilidad
             let isOutOfStock = stockVal <= 0;
             let priceStr = (isNaN(priceVal) || priceVal === 0 || isOutOfStock) ? "$0" : "$" + priceVal.toFixed(2);
 
-            // Procesamos los Acordes (Están en las columnas 8 a la 12, letras I a M)
             let accords = [];
             const widths = ["100%", "85%", "70%", "55%", "40%"];
             for(let i=0; i<5; i++) {
@@ -247,14 +275,12 @@
               }
             }
 
-            // Procesamos las Notas Olfativas (Están en las columnas 13 a la 15, letras N a P)
             let topNotes = row[13] ? row[13].split(',').map(s=>s.trim()) : [];
             let heartNotes = row[14] ? row[14].split(',').map(s=>s.trim()) : [];
             let baseNotes = row[15] ? row[15].split(',').map(s=>s.trim()) : [];
 
-            // Guardamos el perfume armado en nuestra lista
             nuevosPerfumes.push({
-              id: index + 1, // Le damos un ID interno único
+              id: index + 1,
               name: nombre,
               brand: marca,
               gender: genero,
@@ -268,7 +294,6 @@
             });
           });
 
-          // Solo recargamos la pantalla si descubrimos algún cambio en los inventarios
           if (JSON.stringify(nuevosPerfumes) !== JSON.stringify(perfumes)) {
             perfumes = nuevosPerfumes;
             applyFilters();
@@ -287,10 +312,8 @@
       });
     }
 
-    // 1. Carga inicial
     cargarDatos();
 
-    // 2. Comprobación automática cada 20 segundos
     setInterval(() => {
       cargarDatos(true);
     }, 20000);
@@ -306,34 +329,34 @@
       grid.innerHTML = data.map(p => {
         const isPreorder = p.price === "$0" || p.price === "$0.00";
         const displayPrice = isPreorder ? "ENCARGAR" : p.price;
-        const priceClass = isPreorder ? "text-blue-600 text-sm tracking-widest" : "text-gray-900 text-lg";
+        const priceClass = isPreorder ? "text-blue-600 dark:text-blue-400 text-sm tracking-widest" : "text-gray-900 dark:text-white text-lg";
 
         const badgeHTML = isPreorder 
-          ? '<span class="absolute top-3 right-3 bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Bajo Pedido</span>'
-          : '<span class="absolute top-3 right-3 bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Disponible</span>';
+          ? '<span class="absolute top-3 right-3 bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Bajo Pedido</span>'
+          : '<span class="absolute top-3 right-3 bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Disponible</span>';
 
         return `
-        <div onclick="openModal(${p.id})" class="bg-white rounded-xl shadow-sm hover:shadow-xl transition duration-200 cursor-pointer overflow-hidden border border-gray-200 flex flex-col justify-between group">
-          <div class="h-64 flex items-center justify-center p-4 bg-gray-50/70 group-hover:bg-white transition relative">
+        <div onclick="openModal(${p.id})" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition duration-200 cursor-pointer overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col justify-between group">
+          <div class="h-64 flex items-center justify-center p-4 bg-gray-50/70 dark:bg-gray-700/50 group-hover:bg-white dark:group-hover:bg-gray-700 transition relative">
             ${badgeHTML}
             <img src="${p.image}" alt="${p.name}" class="h-full object-contain group-hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/300x400?text=ANLU'">
           </div>
           <div class="p-4 flex flex-col justify-between flex-1">
             <div>
               <div class="flex justify-between items-center">
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">${p.brand}</span>
+                <span class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">${p.brand}</span>
                 <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
-                  p.gender === 'hombre' ? 'bg-blue-50 text-blue-600 border border-blue-200' :
-                  p.gender === 'mujer' ? 'bg-pink-50 text-pink-600 border border-pink-200' :
-                  p.gender === 'splash' ? 'bg-teal-50 text-teal-600 border border-teal-200' :
-                  'bg-purple-50 text-purple-600 border border-purple-200'
+                  p.gender === 'hombre' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800' :
+                  p.gender === 'mujer' ? 'bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 border border-pink-200 dark:border-pink-800' :
+                  p.gender === 'splash' ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800' :
+                  'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800'
                 }">${p.gender}</span>
               </div>
-              <h3 class="font-bold text-gray-900 text-base mt-1 leading-snug">${p.name}</h3>
+              <h3 class="font-bold text-gray-900 dark:text-white text-base mt-1 leading-snug">${p.name}</h3>
             </div>
-            <div class="mt-4 flex justify-between items-center pt-3 border-t border-gray-100">
+            <div class="mt-4 flex justify-between items-center pt-3 border-t border-gray-100 dark:border-gray-700">
               <span class="font-black ${priceClass}">${displayPrice}</span>
-              <button class="text-xs bg-gray-900 text-white px-3 py-1.5 rounded-md font-medium hover:bg-black transition">Ver Notas</button>
+              <button class="text-xs bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-3 py-1.5 rounded-md font-medium hover:bg-black dark:hover:bg-gray-200 transition">Ver Notas</button>
             </div>
           </div>
         </div>
@@ -349,8 +372,8 @@
       const priceLabel = isPreorder ? "Disponibilidad" : "Precio";
       
       const badgeHTML = isPreorder 
-        ? '<span class="absolute top-2 left-2 bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Bajo Pedido</span>'
-        : '<span class="absolute top-2 left-2 bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Disponible</span>';
+        ? '<span class="absolute top-2 left-2 bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Bajo Pedido</span>'
+        : '<span class="absolute top-2 left-2 bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Disponible</span>';
 
       const whatsappText = isPreorder 
         ? encodeURIComponent(`Hola ANLU Perfumes, me interesa encargar el perfume bajo pedido: *${p.name}* (${p.brand})`)
@@ -358,45 +381,45 @@
 
       modalContent.innerHTML = `
         <div class="flex flex-col md:flex-row gap-6 items-center md:items-start mb-6">
-          <div class="w-48 h-48 flex items-center justify-center bg-gray-50 rounded-xl border p-2 flex-shrink-0 relative">
+          <div class="w-48 h-48 flex items-center justify-center bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 p-2 flex-shrink-0 relative">
             ${badgeHTML}
             <img src="${p.image}" class="max-h-full max-w-full object-contain" onerror="this.src='https://via.placeholder.com/300x400?text=ANLU'">
           </div>
           <div class="flex-1 w-full">
-            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">${p.brand}</span>
-            <h2 class="text-2xl font-black text-gray-900 leading-tight">${p.name}</h2>
-            <p class="text-xs text-gray-500 mt-1 mb-4">${p.concentration} • <span class="capitalize font-semibold">${p.gender}</span></p>
+            <span class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">${p.brand}</span>
+            <h2 class="text-2xl font-black text-gray-900 dark:text-white leading-tight">${p.name}</h2>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-4">${p.concentration} • <span class="capitalize font-semibold">${p.gender}</span></p>
             
-            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-600 mb-2">Acordes Principales</h4>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">Acordes Principales</h4>
             ${p.accords.map(a => `
               <div class="accord-bar" style="width: ${a.width}; background-color: ${a.color};">${a.name}</div>
             `).join("")}
           </div>
         </div>
 
-        <div class="border-t border-gray-100 pt-5">
-          <h4 class="text-center font-bold text-gray-800 text-xs uppercase tracking-widest mb-4">Pirámide Olfativa</h4>
+        <div class="border-t border-gray-100 dark:border-gray-700 pt-5">
+          <h4 class="text-center font-bold text-gray-800 dark:text-gray-200 text-xs uppercase tracking-widest mb-4">Pirámide Olfativa</h4>
           
           <div class="space-y-3">
-            <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
-              <span class="text-xs font-bold text-gray-500 uppercase">Notas de Salida:</span>
-              <p class="text-sm font-medium text-gray-800 mt-0.5">${p.topNotes.join(" • ")}</p>
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border-l-4 border-blue-500">
+              <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Notas de Salida:</span>
+              <p class="text-sm font-medium text-gray-800 dark:text-gray-200 mt-0.5">${p.topNotes.join(" • ")}</p>
             </div>
-            <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-pink-500">
-              <span class="text-xs font-bold text-gray-500 uppercase">Notas de Corazón:</span>
-              <p class="text-sm font-medium text-gray-800 mt-0.5">${p.heartNotes.join(" • ")}</p>
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border-l-4 border-pink-500">
+              <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Notas de Corazón:</span>
+              <p class="text-sm font-medium text-gray-800 dark:text-gray-200 mt-0.5">${p.heartNotes.join(" • ")}</p>
             </div>
-            <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-amber-600">
-              <span class="text-xs font-bold text-gray-500 uppercase">Notas de Fondo:</span>
-              <p class="text-sm font-medium text-gray-800 mt-0.5">${p.baseNotes.join(" • ")}</p>
+            <div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border-l-4 border-amber-600">
+              <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Notas de Fondo:</span>
+              <p class="text-sm font-medium text-gray-800 dark:text-gray-200 mt-0.5">${p.baseNotes.join(" • ")}</p>
             </div>
           </div>
         </div>
 
-        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 ${isPreorder ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'} p-4 rounded-xl border">
+        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 ${isPreorder ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600'} p-4 rounded-xl border">
           <div>
-            <span class="text-xs ${isPreorder ? 'text-blue-600' : 'text-gray-500'} uppercase font-semibold">${priceLabel}</span>
-            <div class="text-2xl font-black ${isPreorder ? 'text-blue-700' : 'text-gray-900'}">${displayPrice}</div>
+            <span class="text-xs ${isPreorder ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'} uppercase font-semibold">${priceLabel}</span>
+            <div class="text-2xl font-black ${isPreorder ? 'text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-white'}">${displayPrice}</div>
           </div>
           
           <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -423,11 +446,11 @@
     function filterCategory(cat) {
       currentCategory = cat;
       document.querySelectorAll(".filter-btn").forEach(btn => {
-        btn.classList.remove("bg-gray-900", "text-white");
-        btn.classList.add("bg-gray-100", "text-gray-600");
+        btn.classList.remove("bg-gray-900", "text-white", "dark:bg-white", "dark:text-gray-900");
+        btn.classList.add("bg-gray-100", "text-gray-600", "dark:bg-gray-700", "dark:text-gray-300");
       });
-      event.target.classList.remove("bg-gray-100", "text-gray-600");
-      event.target.classList.add("bg-gray-900", "text-white");
+      event.target.classList.remove("bg-gray-100", "text-gray-600", "dark:bg-gray-700", "dark:text-gray-300");
+      event.target.classList.add("bg-gray-900", "text-white", "dark:bg-white", "dark:text-gray-900");
       applyFilters();
     }
 
