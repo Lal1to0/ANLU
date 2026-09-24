@@ -102,10 +102,39 @@
     </div>
   </main>
 
-  <!-- Botones Flotantes de Redes Sociales (Instagram + WhatsApp) -->
-  <div class="fixed bottom-5 right-5 z-40 flex flex-col items-center gap-3">
+  <!-- BOTÓN FLOTANTE DEL CARRITO (Izquierda) -->
+  <button onclick="toggleCart()" class="fixed bottom-5 left-5 z-40 bg-gray-900 dark:bg-white text-white dark:text-gray-900 w-14 h-14 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition flex items-center justify-center text-xl focus:outline-none relative">
+    <i class="fa-solid fa-cart-shopping"></i>
+    <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white dark:border-gray-900 hidden transition-all">0</span>
+  </button>
+
+  <!-- SIDEBAR DEL CARRITO Y OVERLAY -->
+  <div id="cartOverlay" onclick="toggleCart()" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+  <div id="cartSidebar" class="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-gray-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+    <div class="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-700">
+      <h2 class="text-lg font-black dark:text-white uppercase tracking-wider"><i class="fa-solid fa-cart-shopping mr-2"></i>Tu Pedido</h2>
+      <button onclick="toggleCart()" class="text-gray-400 hover:text-gray-900 dark:hover:text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
+    </div>
     
-    <!-- Botón Flotante Redondo de Instagram -->
+    <div id="cartItems" class="flex-1 overflow-y-auto p-5 space-y-5">
+       <!-- Aquí se inyectan los perfumes del carrito -->
+    </div>
+    
+    <div class="p-5 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+       <div class="flex justify-between items-center mb-4">
+         <span class="font-bold text-gray-500 dark:text-gray-400 uppercase text-sm">Total Estimado:</span>
+         <span id="cartTotal" class="font-black text-2xl text-gray-900 dark:text-white">$0.00</span>
+       </div>
+       <button onclick="checkoutWhatsApp()" class="w-full bg-[#25D366] text-white py-3.5 rounded-xl font-bold text-sm hover:opacity-95 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5">
+         <i class="fa-brands fa-whatsapp text-lg"></i> Enviar Pedido por WhatsApp
+       </button>
+       <p class="text-[10px] text-center text-gray-400 mt-3">* El pago y la entrega se coordinan por WhatsApp.</p>
+    </div>
+  </div>
+
+  <!-- Botones Flotantes de Redes Sociales (Derecha) -->
+  <div class="fixed bottom-5 right-5 z-40 flex flex-col items-center gap-3">
+    <!-- Botón Instagram -->
     <a href="https://instagram.com/anluu.lg" target="_blank" 
        class="w-14 h-14 rounded-full bg-gradient-to-tr from-yellow-500 via-pink-500 to-purple-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center text-2xl group relative"
        title="Síguenos en Instagram">
@@ -115,26 +144,20 @@
       </span>
     </a>
 
-    <!-- Contenedor relativo para el menú desplegable y botón de WhatsApp -->
+    <!-- Menú WhatsApp -->
     <div class="relative flex flex-col items-center">
-      <!-- Menú Desplegable de WhatsApp -->
       <div id="waPopup" class="hidden absolute bottom-16 right-0 bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-4 border border-gray-100 dark:border-gray-700 w-64 animate-fade-in transition-all z-50">
-        <p class="text-xs font-black uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">Escríbenos por WhatsApp</p>
+        <p class="text-xs font-black uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">Consultas Rápidas</p>
         <div class="space-y-2">
-          <a href="https://wa.me/584243306803?text=Hola%20ANLU%20Perfumes%2C%20quisiera%20hacer%20una%20consulta" target="_blank" class="flex items-center gap-3 p-2 rounded-xl hover:bg-green-50 dark:hover:bg-gray-700 transition border border-transparent hover:border-green-200 dark:hover:border-gray-600">
-            <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center text-sm shadow-sm flex-shrink-0">
-              <i class="fa-brands fa-whatsapp"></i>
-            </div>
+          <a href="https://wa.me/584243306803?text=Hola%20ANLU%20Perfumes%2C%20tengo%20una%20duda%20sobre%20el%20catálogo" target="_blank" class="flex items-center gap-3 p-2 rounded-xl hover:bg-green-50 dark:hover:bg-gray-700 transition border border-transparent hover:border-green-200 dark:hover:border-gray-600">
+            <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center text-sm shadow-sm flex-shrink-0"><i class="fa-brands fa-whatsapp"></i></div>
             <div>
               <span class="block text-xs font-bold text-gray-800 dark:text-gray-200">Atención 1</span>
               <span class="block text-[11px] text-gray-500 dark:text-gray-400 font-medium">+58 424-3306803</span>
             </div>
           </a>
-
-          <a href="https://wa.me/584124596671?text=Hola%20ANLU%20Perfumes%2C%20quisiera%20hacer%20una%20consulta" target="_blank" class="flex items-center gap-3 p-2 rounded-xl hover:bg-green-50 dark:hover:bg-gray-700 transition border border-transparent hover:border-green-200 dark:hover:border-gray-600">
-            <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center text-sm shadow-sm flex-shrink-0">
-              <i class="fa-brands fa-whatsapp"></i>
-            </div>
+          <a href="https://wa.me/584124596671?text=Hola%20ANLU%20Perfumes%2C%20tengo%20una%20duda%20sobre%20el%20catálogo" target="_blank" class="flex items-center gap-3 p-2 rounded-xl hover:bg-green-50 dark:hover:bg-gray-700 transition border border-transparent hover:border-green-200 dark:hover:border-gray-600">
+            <div class="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center text-sm shadow-sm flex-shrink-0"><i class="fa-brands fa-whatsapp"></i></div>
             <div>
               <span class="block text-xs font-bold text-gray-800 dark:text-gray-200">Atención 2</span>
               <span class="block text-[11px] text-gray-500 dark:text-gray-400 font-medium">+58 412-4596671</span>
@@ -143,7 +166,6 @@
         </div>
       </div>
 
-      <!-- Botón Flotante Redondo de WhatsApp -->
       <button onclick="toggleWaPopup()" class="bg-[#25D366] text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition flex items-center justify-center text-2xl focus:outline-none">
         <i class="fa-brands fa-whatsapp"></i>
       </button>
@@ -173,10 +195,6 @@
         <a href="https://wa.me/584243306803" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition">
           <i class="fa-brands fa-whatsapp text-base"></i> +58 424-3306803
         </a>
-        <span class="text-gray-300 dark:text-gray-600 hidden md:inline">•</span>
-        <a href="https://wa.me/584124596671" target="_blank" class="flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition">
-          <i class="fa-brands fa-whatsapp text-base"></i> +58 412-4596671
-        </a>
       </div>
     </div>
   </footer>
@@ -200,12 +218,13 @@
 
     const SHEET_ID = "1kCqVj7HIP7oouLyOmwptYOmbXEuzQARgxvmit7EdsXw";
     const GID = "1819198756";
-
     const PRIMARY_WA = "584243306803";
-    const SECONDARY_WA = "584124596671";
     
     let perfumes = [];
     let currentCategory = "todos";
+    
+    // VARIABLES DEL CARRITO
+    let cart = JSON.parse(localStorage.getItem('cartANLU')) || [];
 
     const grid = document.getElementById("perfumesGrid");
     const noResults = document.getElementById("noResults");
@@ -213,6 +232,155 @@
     const modalContent = document.getElementById("modalContent");
     const searchInput = document.getElementById("searchInput");
     const loading = document.getElementById("loading");
+
+    // ==========================================
+    // FUNCIONES DEL CARRITO
+    // ==========================================
+    function toggleCart() {
+      const sidebar = document.getElementById('cartSidebar');
+      const overlay = document.getElementById('cartOverlay');
+      
+      if (sidebar.classList.contains('translate-x-full')) {
+        sidebar.classList.remove('translate-x-full');
+        overlay.classList.remove('hidden');
+        renderCart();
+      } else {
+        sidebar.classList.add('translate-x-full');
+        overlay.classList.add('hidden');
+      }
+    }
+
+    function addToCart(id) {
+      const p = perfumes.find(item => item.id === id);
+      if (!p) return;
+
+      const existingItem = cart.find(item => item.id === id);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ ...p, quantity: 1 });
+      }
+      
+      localStorage.setItem('cartANLU', JSON.stringify(cart));
+      updateCartBadge();
+      closeModal();
+      toggleCart(); // Abre el carrito automáticamente para confirmar
+    }
+
+    function updateCartQuantity(id, change) {
+      const item = cart.find(item => item.id === id);
+      if (item) {
+        item.quantity += change;
+        if (item.quantity <= 0) {
+          cart = cart.filter(i => i.id !== id);
+        }
+        localStorage.setItem('cartANLU', JSON.stringify(cart));
+        renderCart();
+        updateCartBadge();
+      }
+    }
+
+    function updateCartBadge() {
+      const badge = document.getElementById('cartBadge');
+      const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+      
+      if (totalItems > 0) {
+        badge.textContent = totalItems;
+        badge.classList.remove('hidden');
+        badge.classList.add('animate-bounce');
+        setTimeout(() => badge.classList.remove('animate-bounce'), 1000);
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cartItems');
+      const totalEl = document.getElementById('cartTotal');
+      
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="flex flex-col items-center justify-center h-full opacity-50">
+            <i class="fa-solid fa-cart-shopping text-6xl mb-4"></i>
+            <p class="font-medium text-lg">Tu carrito está vacío</p>
+          </div>
+        `;
+        totalEl.textContent = '$0.00';
+        return;
+      }
+
+      let total = 0;
+      container.innerHTML = cart.map(item => {
+        const isPreorder = item.price === "$0" || item.price === "$0.00";
+        if (!isPreorder) {
+          const priceNum = parseFloat(item.price.replace('$', ''));
+          total += priceNum * item.quantity;
+        }
+
+        return `
+          <div class="flex gap-4 border-b border-gray-100 dark:border-gray-700 pb-4 items-center">
+            <img src="${item.image}" class="w-16 h-16 object-contain bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg p-1">
+            <div class="flex-1">
+              <h4 class="text-sm font-bold dark:text-white leading-tight">${item.name}</h4>
+              <p class="text-[10px] text-gray-400 uppercase tracking-widest">${item.brand}</p>
+              <p class="font-black text-sm mt-1 ${isPreorder ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'}">
+                ${isPreorder ? 'Bajo Pedido' : item.price}
+              </p>
+            </div>
+            <div class="flex items-center gap-3 bg-gray-100 dark:bg-gray-900 rounded-lg p-1.5 border dark:border-gray-700">
+              <button onclick="updateCartQuantity(${item.id}, -1)" class="w-6 h-6 flex items-center justify-center font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition">-</button>
+              <span class="text-xs font-bold w-4 text-center dark:text-white">${item.quantity}</span>
+              <button onclick="updateCartQuantity(${item.id}, 1)" class="w-6 h-6 flex items-center justify-center font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition">+</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      totalEl.textContent = `$${total.toFixed(2)}`;
+    }
+
+    function checkoutWhatsApp() {
+      if (cart.length === 0) return;
+
+      let text = "👋 *Hola ANLU Perfumes*, me gustaría realizar el siguiente pedido:\n\n";
+      let total = 0;
+      let hasPreorder = false;
+
+      cart.forEach(item => {
+        const isPreorder = item.price === "$0" || item.price === "$0.00";
+        if (isPreorder) hasPreorder = true;
+        
+        let line = `🛍️ ${item.quantity}x ${item.name} (${item.brand})`;
+        if (!isPreorder) {
+          const priceNum = parseFloat(item.price.replace('$', ''));
+          const subtotal = priceNum * item.quantity;
+          line += ` - $${subtotal.toFixed(2)}`;
+          total += subtotal;
+        } else {
+          line += ` - *(Por Encargar)*`;
+        }
+        text += line + "\n";
+      });
+
+      text += `\n💵 *TOTAL ESTIMADO: $${total.toFixed(2)}*`;
+      
+      if (hasPreorder) {
+        text += `\n\n⚠️ _Nota: Mi pedido incluye artículos bajo encargo. Por favor confirmarme disponibilidad y precio actual._`;
+      }
+
+      text += "\n\nQuedo atento(a) para coordinar el pago y la entrega en La Guaira. ¡Gracias!";
+
+      const url = `https://wa.me/${PRIMARY_WA}?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+      
+      // Opcional: Vaciar el carrito después de enviar
+      // cart = [];
+      // localStorage.setItem('cartANLU', JSON.stringify(cart));
+      // updateCartBadge();
+      // toggleCart();
+    }
+    // ==========================================
+
 
     function toggleWaPopup() {
       const popup = document.getElementById("waPopup");
@@ -302,6 +470,7 @@
           if (!esSilencioso) {
             loading.classList.add("hidden");
             grid.classList.remove("hidden");
+            updateCartBadge(); // Actualizar contador al cargar la página
           }
         },
         error: function(err) {
@@ -375,10 +544,7 @@
         ? '<span class="absolute top-2 left-2 bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Bajo Pedido</span>'
         : '<span class="absolute top-2 left-2 bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-sm">Disponible</span>';
 
-      const whatsappText = isPreorder 
-        ? encodeURIComponent(`Hola ANLU Perfumes, me interesa encargar el perfume bajo pedido: *${p.name}* (${p.brand})`)
-        : encodeURIComponent(`Hola ANLU Perfumes, me interesa comprar el perfume: *${p.name}* (${p.brand}) - ${p.price}`);
-
+      // Cambiamos los botones de compra directa por el botón de Añadir al Carrito
       modalContent.innerHTML = `
         <div class="flex flex-col md:flex-row gap-6 items-center md:items-start mb-6">
           <div class="w-48 h-48 flex items-center justify-center bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 p-2 flex-shrink-0 relative">
@@ -422,17 +588,10 @@
             <div class="text-2xl font-black ${isPreorder ? 'text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-white'}">${displayPrice}</div>
           </div>
           
-          <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <a href="https://wa.me/${PRIMARY_WA}?text=${whatsappText}" 
-               target="_blank" 
-               class="bg-[#25D366] text-white px-5 py-2.5 rounded-xl font-bold text-xs hover:opacity-95 flex items-center justify-center gap-2 shadow-sm transition">
-              <i class="fa-brands fa-whatsapp text-base"></i> ${isPreorder ? 'Encargar (Opción 1)' : 'Comprar (Opción 1)'}
-            </a>
-            <a href="https://wa.me/${SECONDARY_WA}?text=${whatsappText}" 
-               target="_blank" 
-               class="bg-[#128C7E] text-white px-5 py-2.5 rounded-xl font-bold text-xs hover:opacity-95 flex items-center justify-center gap-2 shadow-sm transition">
-              <i class="fa-brands fa-whatsapp text-base"></i> ${isPreorder ? 'Encargar (Opción 2)' : 'Comprar (Opción 2)'}
-            </a>
+          <div class="flex w-full sm:w-auto">
+            <button onclick="addToCart(${p.id})" class="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-3 rounded-xl font-bold text-sm hover:scale-105 flex items-center justify-center gap-2 shadow-lg transition">
+              <i class="fa-solid fa-cart-plus text-lg"></i> Añadir al Carrito
+            </button>
           </div>
         </div>
       `;
