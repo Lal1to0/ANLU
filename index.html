@@ -338,8 +338,7 @@
 
       totalEl.textContent = `$${total.toFixed(2)}`;
     }
-
-    function checkoutWhatsApp() {
+function checkoutWhatsApp() {
       if (cart.length === 0) return;
 
       let text = "👋 *Hola ANLU Perfumes*, me gustaría realizar el siguiente pedido:\n\n";
@@ -368,17 +367,19 @@
         text += `\n\n⚠️ _Nota: Mi pedido incluye artículos bajo encargo. Por favor confirmarme disponibilidad y precio actual._`;
       }
 
-      text += "\n\nQuedo atento(a) para coordinar el pago y la entrega en La Guaira. ¡Gracias!";
+      text += "\n\nQuedo atento(a) para coordinar el pago y la entrega. ¡Gracias!";
 
-      const url = `https://wa.me/${PRIMARY_WA}?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
+      // --- LÓGICA DE NÚMERO ALEATORIO ---
+      // Aquí colocas todos los números que quieras usar
+      const numerosWa = ["584243306803", "584124596671"]; 
       
-      // Opcional: Vaciar el carrito después de enviar
-      // cart = [];
-      // localStorage.setItem('cartANLU', JSON.stringify(cart));
-      // updateCartBadge();
-      // toggleCart();
+      // El sistema elige uno al azar de la lista
+      const numeroElegido = numerosWa[Math.floor(Math.random() * numerosWa.length)];
+      
+      const url = `https://wa.me/${numeroElegido}?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
     }
+   
     // ==========================================
 
 
