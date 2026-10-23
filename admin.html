@@ -105,7 +105,32 @@
          <!-- Pestaña 2: Base de Datos (Google Sheets) -->
             <div id="tab-bd" class="tab-content">
                 <h2>Inventario en Tiempo Real</h2>
-
+                
+<!-- NUEVO: MÓDULO DE REPOSICIÓN DE MERCANCÍA -->
+                <div style="background-color: #272c33; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3b82f6;">
+                    <h3 style="margin-top: 0; color: #60a5fa; font-size: 1rem;">📦 Ingresar Nueva Mercancía (Reposición)</h3>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
+                        <div style="flex: 2; min-width: 200px;">
+                            <label style="font-size: 0.8rem; color: #a1a1aa;">Perfume</label>
+                            <input type="text" id="repo-nombre" placeholder="Ej: Tiana Bath and Body Works" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
+                        </div>
+                        <div style="flex: 1; min-width: 100px;">
+                            <label style="font-size: 0.8rem; color: #a1a1aa;">Proveedor</label>
+                            <input type="text" id="repo-proveedor" placeholder="Ej: Dubai" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
+                        </div>
+                        <div style="flex: 1; min-width: 80px;">
+                            <label style="font-size: 0.8rem; color: #a1a1aa;">Cantidad</label>
+                            <input type="number" id="repo-cantidad" placeholder="Ej: 12" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
+                        </div>
+                        <div style="flex: 1; min-width: 100px;">
+                            <label style="font-size: 0.8rem; color: #a1a1aa;">Costo Unit. ($)</label>
+                            <input type="text" id="repo-costo" placeholder="Ej: 15.50" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
+                        </div>
+                        <button onclick="reponerInventario()" id="btn-reponer" style="background-color: #3b82f6; color: white; padding: 10px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; height: 38px;">Ingresar Stock</button>
+                    </div>
+                    <div id="mensaje-repo" style="margin-top: 15px; padding: 10px; border-radius: 6px; display: none;"></div>
+                </div>
+                
                 <!-- EDITOR INTERNO DE ANLU -->
                 <div style="background-color: #272c33; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
                     <div style="flex: 1; min-width: 200px;">
@@ -225,6 +250,57 @@
 
             btn.disabled = false;
             btn.innerText = "Generar e Inyectar Datos";
+        }
+        // Función para Reponer Inventario
+        async function reponerInventario() {
+            const nombre = document.getElementById('repo-nombre').value;
+            const proveedor = document.getElementById('repo-proveedor').value;
+            const cantidad = document.getElementById('repo-cantidad').value;
+            const costo = document.getElementById('repo-costo').value;
+            const btn = document.getElementById('btn-reponer');
+            const divMensaje = document.getElementById('mensaje-repo');
+
+            if(!nombre || !proveedor || !cantidad || !costo) { alert("Llena todos los campos para registrar la compra."); return; }
+
+            btn.disabled = true;
+            btn.innerText = "⏳ Procesando...";
+            divMensaje.style.display = "none";
+
+            try {
+                const response = await fetch('/api/reponer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: passGuardada, nombre: nombre, proveedor: proveedor, cantidad: cantidad, costo: costo })
+                });
+                const data = await response.json();
+
+                divMensaje.style.display = "block";
+                if (response.ok) {
+                    divMensaje.style.backgroundColor = "#065f46";
+                    divMensaje.style.color = "#a7f3d0";
+                    divMensaje.innerText = data.resultado;
+                    
+                    // Limpia los campos (dejamos el proveedor y costo por si compras varios al mismo)
+                    document.getElementById('repo-nombre').value = "";
+                    document.getElementById('repo-cantidad').value = "";
+                    
+                    // Refrescar el visualizador de Sheets
+                    const iframe = document.getElementById('iframe-sheets');
+                    iframe.src = iframe.src;
+                } else {
+                    divMensaje.style.backgroundColor = "#7f1d1d";
+                    divMensaje.style.color = "#fecaca";
+                    divMensaje.innerText = "❌ Error: " + data.error;
+                }
+            } catch (error) {
+                divMensaje.style.display = "block";
+                divMensaje.style.backgroundColor = "#7f1d1d";
+                divMensaje.style.color = "#fecaca";
+                divMensaje.innerText = "❌ Fallo de red.";
+            }
+
+            btn.disabled = false;
+            btn.innerText = "Ingresar Stock";
         }
     </script>
 </body>
