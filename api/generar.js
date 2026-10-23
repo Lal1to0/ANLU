@@ -13,7 +13,6 @@ export default async function handler(req, res) {
         const apiKey = process.env.GEMINI_API_KEY;
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
         
-        // Le pedimos a Gemini que responda en un formato estricto de datos (JSON)
         const prompt = `Eres un experto en perfumería. Analiza el perfume "${perfume}".
         Devuelve ÚNICAMENTE un objeto JSON válido con esta estructura exacta (sin markdown, sin texto adicional):
         {
@@ -41,23 +40,25 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'Error de la IA: ' + (data.error?.message || 'Desconocido') });
         }
 
-        // Limpiar y procesar la respuesta
         let resultadoTexto = data.candidates[0].content.parts[0].text.trim();
         resultadoTexto = resultadoTexto.replace(/```json/g, "").replace(/```/g, "").trim();
         const perfumeData = JSON.parse(resultadoTexto);
 
-        // Enviar los datos directamente a tu Google Sheets
         const sheetsUrl = process.env.GOOGLE_SHEETS_URL;
         if (!sheetsUrl) {
             return res.status(500).json({ error: 'Falta la URL de Sheets en Vercel' });
         }
 
+        // 🔴 CORRECCIÓN: Agregamos las cabeceras para que Google acepte los datos
         const sheetsResponse = await fetch(sheetsUrl, {
             method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             body: JSON.stringify(perfumeData)
         });
 
-        // 🔴 NUEVO: Leemos el texto crudo primero para ver qué responde Google
         const rawText = await sheetsResponse.text();
         
         try {
@@ -68,8 +69,7 @@ export default async function handler(req, res) {
                 throw new Error("Google Sheets rechazó la conexión.");
             }
         } catch (e) {
-            // Si falla al leer el JSON, mostramos los primeros caracteres de lo que mandó Google
-            return res.status(500).json({ error: 'Google devolvió HTML en vez de datos. Respuesta: ' + rawText.substring(0, 100) + '...' });
+            return res.status(500).json({ error: 'Asegúrate de que la pestaña de tu Excel se llame exactamente "Inventario".' });
         }
 
     } catch (error) {
