@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANLU Admin - Carga IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-6">
+    <div class="w-full max-w-md bg-gray-800 p-8 rounded-xl shadow-lg mt-10">
+        <h1 class="text-2xl font-bold mb-6 text-center text-blue-400">🤖 ANLU IA Admin</h1>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm text-gray-400 mb-1">Contraseña de Administrador</label>
+                <input type="password" id="password" class="w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="••••••••">
+            </div>
+            
+            <div>
+                <label class="block text-sm text-gray-400 mb-1">Nombre Exacto del Perfume</label>
+                <input type="text" id="perfumeName" class="w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ej: Nautica Voyage">
+            </div>
+            
+            <button onclick="generarPerfume()" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-3 rounded-lg transition-colors mt-2">
+                Generar Datos Olfativos
+            </button>
+        </div>
+
+        <div id="resultado" class="mt-6 hidden bg-gray-700 p-4 rounded-lg text-sm font-mono overflow-x-auto whitespace-pre-wrap">
+            <!-- Los datos de la IA aparecerán aquí -->
+        </div>
+    </div>
+
+    <script>
+        async function generarPerfume() {
+            const pass = document.getElementById('password').value;
+            const perfume = document.getElementById('perfumeName').value;
+            const divResultado = document.getElementById('resultado');
+            const boton = document.querySelector('button');
+            
+            if(!pass || !perfume) return alert("Llena todos los campos");
+            
+            boton.disabled = true;
+            boton.innerText = "Consultando...";
+            divResultado.classList.remove('hidden');
+            divResultado.innerHTML = "Conectando con la IA... ⏳";
+
+            try {
+                const respuesta = await fetch('/api/generar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pass, perfume: perfume })
+                });
+                
+                const datos = await respuesta.json();
+                
+                if(respuesta.ok) {
+                    divResultado.innerHTML = datos.resultado;
+                } else {
+                    divResultado.innerHTML = "❌ Error: " + datos.error;
+                }
+            } catch (error) {
+                divResultado.innerHTML = "❌ Error de conexión.";
+            }
+            
+            boton.disabled = false;
+            boton.innerText = "Generar Datos Olfativos";
+        }
+    </script>
+</body>
+</html>
