@@ -155,19 +155,41 @@
                 </div>
             </div>
 
-            <!-- Pestaña 3: Analytics -->
-            <div id="tab-analytics" class="tab-content">
-                <h2>Analíticas de Tráfico</h2>
-                <div class="analytics-card">
-                    <p>Por políticas de seguridad, Vercel no permite incrustar su panel de Analytics dentro de otras páginas web (bloqueo X-Frame-Options).</p>
-                    <p>Haz clic en el botón para abrir el panel oficial de métricas de ANLU Parfums en una pestaña segura.</p>
-                    <!-- 🔴 CAMBIA LA URL POR EL ENLACE REAL DE TUS ANALYTICS EN VERCEL -->
-                    <a href="https://vercel.com/anlu1/anlu/analytics" target="_blank">Abrir Vercel Web Analytics 🚀</a>
+            <!-- Pestaña 3: Analíticas -->
+            <div id="tab-analiticas" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Métricas Financieras</h2>
+                    <button onclick="cargarFinanzas()" id="btn-finanzas" style="background-color: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer;">🔄 Actualizar Datos</button>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <!-- Tarjeta Inventario -->
+                    <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #10b981; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                        <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Valor de Inventario</h4>
+                        <p id="val-inventario" style="font-size: 1.8rem; font-weight: bold; color: #10b981; margin: 10px 0 0 0;">$0.00</p>
+                    </div>
+                    <!-- Tarjeta Ventas -->
+                    <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #3b82f6; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                        <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Ventas Totales</h4>
+                        <p id="val-ventas" style="font-size: 1.8rem; font-weight: bold; color: #3b82f6; margin: 10px 0 0 0;">$0.00</p>
+                    </div>
+                    <!-- Tarjeta Costo -->
+                    <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #f59e0b; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                        <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Costo de Mercancía</h4>
+                        <p id="val-costo" style="font-size: 1.8rem; font-weight: bold; color: #f59e0b; margin: 10px 0 0 0;">$0.00</p>
+                    </div>
+                    <!-- Tarjeta Ganancia -->
+                    <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #10b981; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                        <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Ganancia Real</h4>
+                        <p id="val-ganancia" style="font-size: 1.8rem; font-weight: bold; color: #10b981; margin: 10px 0 0 0;">$0.00</p>
+                    </div>
+                    <!-- Tarjeta Por Cobrar -->
+                    <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #ef4444; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                        <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Cuentas por Cobrar</h4>
+                        <p id="val-porcobrar" style="font-size: 1.8rem; font-weight: bold; color: #ef4444; margin: 10px 0 0 0;">$0.00</p>
+                    </div>
                 </div>
             </div>
-
-        </div>
-    </div>
 
     <script>
         // 🔴 1. CAMBIA ESTO POR LA CONTRASEÑA FRONTAL QUE QUIERAS USAR
@@ -301,6 +323,36 @@
 
             btn.disabled = false;
             btn.innerText = "Ingresar Stock";
+        }
+        // Función para cargar Métricas Financieras
+        async function cargarFinanzas() {
+            const btn = document.getElementById('btn-finanzas');
+            btn.disabled = true;
+            btn.innerText = "⏳ Cargando...";
+
+            try {
+                const response = await fetch('/api/finanzas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: passGuardada })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('val-inventario').innerText = data.inventario || "$0.00";
+                    document.getElementById('val-ventas').innerText = data.ventas || "$0.00";
+                    document.getElementById('val-costo').innerText = data.costo || "$0.00";
+                    document.getElementById('val-ganancia').innerText = data.ganancia || "$0.00";
+                    document.getElementById('val-porcobrar').innerText = data.porCobrar || "$0.00";
+                } else {
+                    alert("Error al cargar las métricas.");
+                }
+            } catch (error) {
+                alert("Fallo de red al conectar con el servidor.");
+            }
+
+            btn.disabled = false;
+            btn.innerText = "🔄 Actualizar Datos";
         }
     </script>
 </body>
