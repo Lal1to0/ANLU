@@ -19,7 +19,7 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'Falta la API KEY de Gemini en las variables de Vercel. ¡Haz un Redeploy!' });
         }
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
         const prompt = `Eres una base de datos experta en perfumería. Dame los datos de "${perfume}". 
         Devuelve ÚNICAMENTE los 15 datos separados por una tabulación (para pegar directo en Google Sheets).
         Estructura exacta: Nombre [TAB] Marca [TAB] Género [TAB] $0,00 [TAB] 0 [TAB] [TAB] Concentración [TAB] Acorde_1 [TAB] Acorde_2 [TAB] Acorde_3 [TAB] Acorde_4 [TAB] Acorde_5 [TAB] Notas_Salida [TAB] Notas_Corazón [TAB] Notas_Fondo.
