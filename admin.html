@@ -36,7 +36,6 @@
         .formulario-ia button { background-color: #3b82f6; color: white; font-weight: bold; cursor: pointer; }
         #mensaje { margin-top: 15px; padding: 15px; border-radius: 6px; display: none; }
         
-        /* IFRAME GOOGLE SHEETS */
         /* IFRAME GOOGLE SHEETS PREMIUM */
         .table-container {
             border-radius: 8px;
@@ -78,8 +77,8 @@
             <h2>⚙️ Panel Central</h2>
             <button class="tab-btn active" onclick="abrirPestana(event, 'tab-ia')">✨ Cargar Perfume (IA)</button>
             <button class="tab-btn" onclick="abrirPestana(event, 'tab-bd')">📊 Base de Datos</button>
-            <button class="tab-btn" onclick="abrirPestana(event, 'tab-analytics')">📈 Analíticas</button>
-            <button class="tab-btn" onclick="openTab('tab-catalogo'); cargarCatalogoAdmin();">🛒 Catálogo Visual</button>
+            <button class="tab-btn" onclick="abrirPestana(event, 'tab-analiticas')">📈 Analíticas</button>
+            <button class="tab-btn" onclick="abrirPestana(event, 'tab-catalogo'); cargarCatalogoAdmin();">🛒 Catálogo Visual</button>
         </div>
 
         <!-- CONTENIDO -->
@@ -107,7 +106,7 @@
             <div id="tab-bd" class="tab-content">
                 <h2>Inventario en Tiempo Real</h2>
                 
-<!-- NUEVO: MÓDULO DE REPOSICIÓN DE MERCANCÍA -->
+                <!-- MÓDULO DE REPOSICIÓN DE MERCANCÍA -->
                 <div style="background-color: #272c33; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3b82f6;">
                     <h3 style="margin-top: 0; color: #60a5fa; font-size: 1rem;">📦 Ingresar Nueva Mercancía (Reposición)</h3>
                     <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
@@ -151,7 +150,6 @@
                 <div id="mensaje-edicion" style="margin-bottom: 15px; padding: 10px; border-radius: 6px; display: none;"></div>
 
                 <div class="table-container">
-                    <!-- Usamos el enlace pubhtml que permite el Dark Mode perfecto -->
                     <iframe id="iframe-sheets" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vS5AE2sLXFhZxsyvbxFAxTFIApUx2fsaxSArZ8JI1_cFxqhjpdCnc8haFrrSIFvbmpEJcxHTiXIHw4D/pubhtml?gid=1819198756&single=true&chrome=false&widget=false&headers=false"></iframe>
                 </div>
             </div>
@@ -164,27 +162,22 @@
                 </div>
                 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <!-- Tarjeta Inventario -->
                     <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #10b981; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
                         <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Valor de Inventario</h4>
                         <p id="val-inventario" style="font-size: 1.8rem; font-weight: bold; color: #10b981; margin: 10px 0 0 0;">$0.00</p>
                     </div>
-                    <!-- Tarjeta Ventas -->
                     <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #3b82f6; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
                         <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Ventas Totales</h4>
                         <p id="val-ventas" style="font-size: 1.8rem; font-weight: bold; color: #3b82f6; margin: 10px 0 0 0;">$0.00</p>
                     </div>
-                    <!-- Tarjeta Costo -->
                     <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #f59e0b; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
                         <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Costo de Mercancía</h4>
                         <p id="val-costo" style="font-size: 1.8rem; font-weight: bold; color: #f59e0b; margin: 10px 0 0 0;">$0.00</p>
                     </div>
-                    <!-- Tarjeta Ganancia -->
                     <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #10b981; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
                         <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Ganancia Real</h4>
                         <p id="val-ganancia" style="font-size: 1.8rem; font-weight: bold; color: #10b981; margin: 10px 0 0 0;">$0.00</p>
                     </div>
-                    <!-- Tarjeta Por Cobrar -->
                     <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #ef4444; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
                         <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Cuentas por Cobrar</h4>
                         <p id="val-porcobrar" style="font-size: 1.8rem; font-weight: bold; color: #ef4444; margin: 10px 0 0 0;">$0.00</p>
@@ -198,18 +191,19 @@
                     <h2>Catálogo de Administración</h2>
                     <button onclick="cargarCatalogoAdmin()" style="background-color: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer;">🔄 Refrescar</button>
                 </div>
-                <!-- Aquí se dibujarán las tarjetas automáticamente -->
                 <div id="grid-catalogo" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
                 </div>
             </div>
 
+        </div> <!-- Cierra content-area -->
+    </div> <!-- Cierra dashboard -->
+
     <script>
-        // 🔴 1. CAMBIA ESTO POR LA CONTRASEÑA FRONTAL QUE QUIERAS USAR
         const CLAVE_ACCESO = "Lalo2211."; 
         
-        let passGuardada = ""; // Para enviarla a la API de IA
+        let passGuardada = "";
 
-        // Función de Login
+        // Login
         function verificarLogin() {
             const inputPass = document.getElementById('login-pass').value;
             if (inputPass === CLAVE_ACCESO) {
@@ -221,7 +215,7 @@
             }
         }
 
-        // Función para cambiar de pestañas
+        // Pestañas
         function abrirPestana(evt, idPestana) {
             let i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
@@ -236,56 +230,42 @@
             evt.currentTarget.classList.add("active");
         }
 
-        // Función de la IA (Conecta con tu api/generar.js)
+        // IA
         async function generarDatos() {
             const perfume = document.getElementById('perfume').value;
             const precio = document.getElementById('precio-nuevo').value;
             const imagen = document.getElementById('imagen-nueva').value;
-            
             const btn = document.getElementById('btn-generar');
             const divMensaje = document.getElementById('mensaje');
             
             if(!perfume) { alert("Ingresa el nombre del perfume"); return; }
-
-            btn.disabled = true;
-            btn.innerText = "⏳ Consultando a la IA e inyectando...";
-            divMensaje.style.display = "none";
+            btn.disabled = true; btn.innerText = "⏳ Consultando a la IA..."; divMensaje.style.display = "none";
 
             try {
                 const response = await fetch('/api/generar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // 🔴 ENVIAMOS TODO JUNTO AL BACKEND
                     body: JSON.stringify({ password: passGuardada, perfume: perfume, precio: precio, imagen: imagen }) 
                 });
-
                 const data = await response.json();
-
                 divMensaje.style.display = "block";
                 if (response.ok) {
-                    divMensaje.style.backgroundColor = "#065f46";
-                    divMensaje.style.color = "#a7f3d0";
+                    divMensaje.style.backgroundColor = "#065f46"; divMensaje.style.color = "#a7f3d0";
                     divMensaje.innerText = data.resultado;
-                    // Limpiar campos
                     document.getElementById('perfume').value = ""; 
                     document.getElementById('precio-nuevo').value = ""; 
                     document.getElementById('imagen-nueva').value = ""; 
                 } else {
-                    divMensaje.style.backgroundColor = "#7f1d1d";
-                    divMensaje.style.color = "#fecaca";
+                    divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca";
                     divMensaje.innerText = "❌ Error: " + data.error;
                 }
             } catch (error) {
-                divMensaje.style.display = "block";
-                divMensaje.style.backgroundColor = "#7f1d1d";
-                divMensaje.style.color = "#fecaca";
-                divMensaje.innerText = "❌ Fallo de conexión.";
+                divMensaje.style.display = "block"; divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca"; divMensaje.innerText = "❌ Fallo de conexión.";
             }
-
-            btn.disabled = false;
-            btn.innerText = "Generar e Inyectar Datos";
+            btn.disabled = false; btn.innerText = "Generar e Inyectar Datos";
         }
-        // Función para Reponer Inventario
+
+        // Reposición
         async function reponerInventario() {
             const nombre = document.getElementById('repo-nombre').value;
             const proveedor = document.getElementById('repo-proveedor').value;
@@ -294,11 +274,8 @@
             const btn = document.getElementById('btn-reponer');
             const divMensaje = document.getElementById('mensaje-repo');
 
-            if(!nombre || !proveedor || !cantidad || !costo) { alert("Llena todos los campos para registrar la compra."); return; }
-
-            btn.disabled = true;
-            btn.innerText = "⏳ Procesando...";
-            divMensaje.style.display = "none";
+            if(!nombre || !proveedor || !cantidad || !costo) { alert("Llena todos los campos."); return; }
+            btn.disabled = true; btn.innerText = "⏳ Procesando..."; divMensaje.style.display = "none";
 
             try {
                 const response = await fetch('/api/reponer', {
@@ -307,40 +284,58 @@
                     body: JSON.stringify({ password: passGuardada, nombre: nombre, proveedor: proveedor, cantidad: cantidad, costo: costo })
                 });
                 const data = await response.json();
-
                 divMensaje.style.display = "block";
                 if (response.ok) {
-                    divMensaje.style.backgroundColor = "#065f46";
-                    divMensaje.style.color = "#a7f3d0";
-                    divMensaje.innerText = data.resultado;
-                    
-                    // Limpia los campos (dejamos el proveedor y costo por si compras varios al mismo)
-                    document.getElementById('repo-nombre').value = "";
-                    document.getElementById('repo-cantidad').value = "";
-                    
-                    // Refrescar el visualizador de Sheets
-                    const iframe = document.getElementById('iframe-sheets');
-                    iframe.src = iframe.src;
+                    divMensaje.style.backgroundColor = "#065f46"; divMensaje.style.color = "#a7f3d0"; divMensaje.innerText = data.resultado;
+                    document.getElementById('repo-nombre').value = ""; document.getElementById('repo-cantidad').value = "";
+                    const iframe = document.getElementById('iframe-sheets'); iframe.src = iframe.src;
                 } else {
-                    divMensaje.style.backgroundColor = "#7f1d1d";
-                    divMensaje.style.color = "#fecaca";
-                    divMensaje.innerText = "❌ Error: " + data.error;
+                    divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca"; divMensaje.innerText = "❌ Error: " + data.error;
                 }
             } catch (error) {
-                divMensaje.style.display = "block";
-                divMensaje.style.backgroundColor = "#7f1d1d";
-                divMensaje.style.color = "#fecaca";
-                divMensaje.innerText = "❌ Fallo de red.";
+                divMensaje.style.display = "block"; divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca"; divMensaje.innerText = "❌ Fallo de red.";
             }
-
-            btn.disabled = false;
-            btn.innerText = "Ingresar Stock";
+            btn.disabled = false; btn.innerText = "Ingresar Stock";
         }
-        // Función para cargar Métricas Financieras
+
+        // Editar Precios e Imágenes manual
+        async function guardarEdicion() {
+            const nombre = document.getElementById('edit-nombre').value;
+            const precio = document.getElementById('edit-precio').value;
+            const imagen = document.getElementById('edit-imagen').value;
+            const btn = document.getElementById('btn-guardar');
+            const divMensaje = document.getElementById('mensaje-edicion');
+
+            if(!nombre) { alert("Escribe el nombre del perfume"); return; }
+            if(!precio && !imagen) { alert("Debes escribir un precio o una imagen nueva"); return; }
+
+            btn.disabled = true; btn.innerText = "⏳ Guardando..."; divMensaje.style.display = "none";
+
+            try {
+                const response = await fetch('/api/actualizar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: passGuardada, nombre: nombre, precio: precio, imagen: imagen })
+                });
+                const data = await response.json();
+                divMensaje.style.display = "block";
+                if (response.ok) {
+                    divMensaje.style.backgroundColor = "#065f46"; divMensaje.style.color = "#a7f3d0"; divMensaje.innerText = data.resultado;
+                    document.getElementById('edit-precio').value = ""; document.getElementById('edit-imagen').value = "";
+                    const iframe = document.getElementById('iframe-sheets'); iframe.src = iframe.src;
+                } else {
+                    divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca"; divMensaje.innerText = "❌ Error: " + data.error;
+                }
+            } catch (error) {
+                divMensaje.style.display = "block"; divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca"; divMensaje.innerText = "❌ Fallo de red.";
+            }
+            btn.disabled = false; btn.innerText = "Guardar Cambios";
+        }
+
+        // Finanzas
         async function cargarFinanzas() {
             const btn = document.getElementById('btn-finanzas');
-            btn.disabled = true;
-            btn.innerText = "⏳ Cargando...";
+            btn.disabled = true; btn.innerText = "⏳ Cargando...";
 
             try {
                 const response = await fetch('/api/finanzas', {
@@ -360,13 +355,12 @@
                     alert("Error al cargar las métricas.");
                 }
             } catch (error) {
-                alert("Fallo de red al conectar con el servidor.");
+                alert("Fallo de red.");
             }
-
-            btn.disabled = false;
-            btn.innerText = "🔄 Actualizar Datos";
+            btn.disabled = false; btn.innerText = "🔄 Actualizar Datos";
         }
-        // Funciones del Catálogo Visual
+
+        // Catálogo Visual
         async function cargarCatalogoAdmin() {
             const grid = document.getElementById('grid-catalogo');
             grid.innerHTML = "<p style='color:#a1a1aa;'>Cargando inventario...</p>";
@@ -380,16 +374,13 @@
                 
                 if (response.ok) {
                     const perfumes = await response.json();
-                    grid.innerHTML = ""; // Limpiar
+                    grid.innerHTML = ""; 
                     
                     perfumes.forEach((p, index) => {
-                        // Busca la columna correcta (ajusta los nombres si en tu Excel se llaman diferente)
                         const nombre = p["Nombre"] || "Sin nombre";
                         const imagen = p["Imagen_URL"] || "https://via.placeholder.com/200x200?text=Sin+Imagen";
                         const stock = p["Stock"] || "0";
                         const precioVenta = p["Precio"] || "";
-                        
-                        // Busca el Costo (prueba diferentes nombres de columna que podrías tener)
                         const costo = p["Costo"] || p["Precio de Compra"] || p["Costo_Unitario"] || "N/A";
 
                         const card = `
