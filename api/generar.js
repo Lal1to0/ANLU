@@ -5,24 +5,28 @@ export default async function handler(req, res) {
 
     const { password, perfume } = req.body;
 
-    // 1. Validar la contraseña de ANLU
     if (password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ error: 'Contraseña incorrecta. Acceso denegado.' });
     }
 
     try {
         const apiKey = process.env.GEMINI_API_KEY;
-        
-        // 2. Usamos el modelo exacto que confirmó tu llave API
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
         
-        // 3. Instrucciones estrictas para la IA
-        const prompt = `Eres una base de datos experta en perfumería. Dame los datos de "${perfume}". 
-        Devuelve ÚNICAMENTE los 15 datos separados por una tabulación (para pegar directo en Google Sheets).
-        Estructura exacta: Nombre [TAB] Marca [TAB] Género [TAB] $0,00 [TAB] 0 [TAB] [TAB] Concentración [TAB] Acorde_1 [TAB] Acorde_2 [TAB] Acorde_3 [TAB] Acorde_4 [TAB] Acorde_5 [TAB] Notas_Salida [TAB] Notas_Corazón [TAB] Notas_Fondo.
-        No uses markdown, ni tablas, ni saludos. Solo la línea de texto limpia.`;
+        // Le pedimos a Gemini que responda en un formato estricto de datos (JSON)
+        const prompt = `Eres un experto en perfumería. Analiza el perfume "${perfume}".
+        Devuelve ÚNICAMENTE un objeto JSON válido con esta estructura exacta (sin markdown, sin texto adicional):
+        {
+          "nombre": "Nombre del perfume",
+          "marca": "Marca",
+          "genero": "Femenino / Masculino / Unisex",
+          "concentracion": "EDT / EDP / Parfum / etc",
+          "acordes": ["Acorde 1", "Acorde 2", "Acorde 3", "Acorde 4", "Acorde 5"],
+          "salida": "Notas de salida",
+          "corazon": "Notas de corazón",
+          "fondo": "Notas de fondo"
+        }`;
 
-        // 4. Conexión con Gemini
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -34,14 +38,34 @@ export default async function handler(req, res) {
         const data = await response.json();
         
         if (!response.ok) {
-            return res.status(500).json({ error: 'Error de la IA: ' + (data.error?.message || 'Error desconocido') });
+            return res.status(500).json({ error: 'Error de la IA: ' + (data.error?.message || 'Desconocido') });
         }
 
-        // 5. Enviar los datos listos al panel de ANLU
-        const resultadoTexto = data.candidates[0].content.parts[0].text.trim();
-        res.status(200).json({ resultado: resultadoTexto });
+        // Limpiar y procesar la respuesta
+        let resultadoTexto = data.candidates[0].content.parts[0].text.trim();
+        resultadoTexto = resultadoTexto.replace(/```json/g, "").replace(/```/g, "").trim();
+        const perfumeData = JSON.parse(resultadoTexto);
+
+        // Enviar los datos directamente a tu Google Sheets
+        const sheetsUrl = process.env.GOOGLE_SHEETS_URL;
+        if (!sheetsUrl) {
+            return res.status(500).json({ error: 'Falta la URL de Sheets en Vercel' });
+        }
+
+        const sheetsResponse = await fetch(sheetsUrl, {
+            method: 'POST',
+            body: JSON.stringify(perfumeData)
+        });
+
+        const sheetsResult = await sheetsResponse.json();
+
+        if (sheetsResult.estado === "exito") {
+            res.status(200).json({ resultado: `✅ ¡ÉXITO! Los datos de ${perfumeData.nombre} (${perfumeData.marca}) se inyectaron automáticamente en tu Google Sheets. Ve a revisarlo.` });
+        } else {
+            throw new Error("Google Sheets rechazó la conexión.");
+        }
 
     } catch (error) {
-        res.status(500).json({ error: 'Error interno del servidor: ' + error.message });
+        res.status(500).json({ error: 'Error del sistema: ' + error.message });
     }
 }
