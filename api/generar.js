@@ -22,10 +22,10 @@ export default async function handler(req, res) {
         const prompt = `Eres un experto en perfumería. Analiza el perfume "${perfume}".
         Devuelve ÚNICAMENTE un objeto JSON válido con esta estructura exacta (sin markdown, sin texto adicional):
         {
-          "nombre": "Nombre del perfume",
+          "nombre": "Nombre del producto",
           "marca": "Marca",
-          "genero": "Femenino / Masculino / Unisex",
-          "concentracion": "EDT / EDP / Parfum / etc",
+          "genero": "Hombre / Mujer / Unisex. (⚠️ REGLA ESTRICTA: Si el producto es un Body Splash o Body Mist, escribe exactamente la palabra 'Splash' aquí, sin importar para quién sea)",
+          "concentracion": "EDT / EDP / Parfum / Body Mist / etc",
           "acordes": ["Acorde 1", "Acorde 2", "Acorde 3", "Acorde 4", "Acorde 5"],
           "salida": "Notas de salida",
           "corazon": "Notas de corazón",
