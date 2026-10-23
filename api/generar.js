@@ -57,12 +57,19 @@ export default async function handler(req, res) {
             body: JSON.stringify(perfumeData)
         });
 
-        const sheetsResult = await sheetsResponse.json();
-
-        if (sheetsResult.estado === "exito") {
-            res.status(200).json({ resultado: `✅ ¡ÉXITO! Los datos de ${perfumeData.nombre} (${perfumeData.marca}) se inyectaron automáticamente en tu Google Sheets. Ve a revisarlo.` });
-        } else {
-            throw new Error("Google Sheets rechazó la conexión.");
+        // 🔴 NUEVO: Leemos el texto crudo primero para ver qué responde Google
+        const rawText = await sheetsResponse.text();
+        
+        try {
+            const sheetsResult = JSON.parse(rawText);
+            if (sheetsResult.estado === "exito") {
+                res.status(200).json({ resultado: `✅ ¡ÉXITO! Los datos de ${perfumeData.nombre} se inyectaron automáticamente en tu Google Sheets.` });
+            } else {
+                throw new Error("Google Sheets rechazó la conexión.");
+            }
+        } catch (e) {
+            // Si falla al leer el JSON, mostramos los primeros caracteres de lo que mandó Google
+            return res.status(500).json({ error: 'Google devolvió HTML en vez de datos. Respuesta: ' + rawText.substring(0, 100) + '...' });
         }
 
     } catch (error) {
