@@ -3,7 +3,8 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Método no permitido' });
     }
 
-    const { password, perfume } = req.body;
+    // 🔴 AHORA RECIBIMOS EL PRECIO Y LA IMAGEN DESDE EL PANEL FRONTAL
+    const { password, perfume, precio, imagen } = req.body;
 
     if (password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ error: 'Contraseña incorrecta. Acceso denegado.' });
@@ -63,6 +64,10 @@ export default async function handler(req, res) {
         resultadoTexto = resultadoTexto.replace(/```json/g, "").replace(/```/g, "").trim();
         const perfumeData = JSON.parse(resultadoTexto);
 
+        // 🔴 ANEXAMOS EL PRECIO Y LA IMAGEN QUE ENVIASTE ANTES DE MANDARLO A GOOGLE
+        perfumeData.precio = precio || "";
+        perfumeData.imagen = imagen || "";
+
         const sheetsUrl = process.env.GOOGLE_SHEETS_URL;
         if (!sheetsUrl) {
             return res.status(500).json({ error: 'Falta la URL de Sheets en Vercel' });
@@ -83,7 +88,7 @@ export default async function handler(req, res) {
             const sheetsResult = JSON.parse(rawText);
             if (sheetsResult.estado === "exito") {
                 // Modificamos el mensaje para que te diga qué modelo logró hacer el trabajo
-                res.status(200).json({ resultado: `✅ ¡ÉXITO! Datos inyectados en tu Google Sheets. (Se usó el modelo: ${modeloExitoso})` });
+                res.status(200).json({ resultado: `✅ ¡ÉXITO! Datos, precio e imagen inyectados en tu Google Sheets. (Se usó el modelo: ${modeloExitoso})` });
             } else {
                 throw new Error("Google Sheets rechazó la conexión.");
             }
