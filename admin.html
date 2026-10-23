@@ -95,12 +95,31 @@
                 </div>
             </div>
 
-          <!-- Pestaña 2: Base de Datos (Google Sheets) -->
+         <!-- Pestaña 2: Base de Datos (Google Sheets) -->
             <div id="tab-bd" class="tab-content">
                 <h2>Inventario en Tiempo Real</h2>
+
+                <!-- EDITOR INTERNO DE ANLU -->
+                <div style="background-color: #272c33; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.8rem; color: #a1a1aa;">Perfume a Editar (Nombre exacto)</label>
+                        <input type="text" id="edit-nombre" placeholder="Ej: Tiana Bath and Body Works" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
+                    </div>
+                    <div style="flex: 1; min-width: 100px;">
+                        <label style="font-size: 0.8rem; color: #a1a1aa;">Nuevo Precio</label>
+                        <input type="text" id="edit-precio" placeholder="$0.00" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
+                    </div>
+                    <div style="flex: 2; min-width: 200px;">
+                        <label style="font-size: 0.8rem; color: #a1a1aa;">URL de la Imagen (PNG)</label>
+                        <input type="text" id="edit-imagen" placeholder="https://..." style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
+                    </div>
+                    <button onclick="guardarEdicion()" id="btn-guardar" style="background-color: #10b981; color: white; padding: 10px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; height: 38px;">Guardar Cambios</button>
+                </div>
+                <div id="mensaje-edicion" style="margin-bottom: 15px; padding: 10px; border-radius: 6px; display: none;"></div>
+
                 <div class="table-container">
-                    <!-- Enlace directo al editor con interfaz mínima (rm=minimal) -->
-                    <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vS5AE2sLXFhZxsyvbxFAxTFIApUx2fsaxSArZ8JI1_cFxqhjpdCnc8haFrrSIFvbmpEJcxHTiXIHw4D/pubhtml?gid=1819198756&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
+                    <!-- Usamos el enlace pubhtml que permite el Dark Mode perfecto -->
+                    <iframe id="iframe-sheets" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vS5AE2sLXFhZxsyvbxFAxTFIApUx2fsaxSArZ8JI1_cFxqhjpdCnc8haFrrSIFvbmpEJcxHTiXIHw4D/pubhtml?gid=1819198756&single=true&chrome=false&widget=false&headers=false"></iframe>
                 </div>
             </div>
 
