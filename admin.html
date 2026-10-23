@@ -79,6 +79,7 @@
             <button class="tab-btn active" onclick="abrirPestana(event, 'tab-ia')">✨ Cargar Perfume (IA)</button>
             <button class="tab-btn" onclick="abrirPestana(event, 'tab-bd')">📊 Base de Datos</button>
             <button class="tab-btn" onclick="abrirPestana(event, 'tab-analytics')">📈 Analíticas</button>
+            <button class="tab-btn" onclick="openTab('tab-catalogo'); cargarCatalogoAdmin();">🛒 Catálogo Visual</button>
         </div>
 
         <!-- CONTENIDO -->
@@ -188,6 +189,17 @@
                         <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Cuentas por Cobrar</h4>
                         <p id="val-porcobrar" style="font-size: 1.8rem; font-weight: bold; color: #ef4444; margin: 10px 0 0 0;">$0.00</p>
                     </div>
+                </div>
+            </div>
+
+            <!-- Pestaña 4: Catálogo Visual Admin -->
+            <div id="tab-catalogo" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Catálogo de Administración</h2>
+                    <button onclick="cargarCatalogoAdmin()" style="background-color: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer;">🔄 Refrescar</button>
+                </div>
+                <!-- Aquí se dibujarán las tarjetas automáticamente -->
+                <div id="grid-catalogo" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
                 </div>
             </div>
 
@@ -353,6 +365,86 @@
 
             btn.disabled = false;
             btn.innerText = "🔄 Actualizar Datos";
+        }
+        // Funciones del Catálogo Visual
+        async function cargarCatalogoAdmin() {
+            const grid = document.getElementById('grid-catalogo');
+            grid.innerHTML = "<p style='color:#a1a1aa;'>Cargando inventario...</p>";
+
+            try {
+                const response = await fetch('/api/inventario', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: passGuardada })
+                });
+                
+                if (response.ok) {
+                    const perfumes = await response.json();
+                    grid.innerHTML = ""; // Limpiar
+                    
+                    perfumes.forEach((p, index) => {
+                        // Busca la columna correcta (ajusta los nombres si en tu Excel se llaman diferente)
+                        const nombre = p["Nombre"] || "Sin nombre";
+                        const imagen = p["Imagen_URL"] || "https://via.placeholder.com/200x200?text=Sin+Imagen";
+                        const stock = p["Stock"] || "0";
+                        const precioVenta = p["Precio"] || "";
+                        
+                        // Busca el Costo (prueba diferentes nombres de columna que podrías tener)
+                        const costo = p["Costo"] || p["Precio de Compra"] || p["Costo_Unitario"] || "N/A";
+
+                        const card = `
+                        <div style="background-color: #272c33; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
+                            <div style="height: 200px; background-color: #ffffff; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                <img src="${imagen}" alt="Perfume" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                            </div>
+                            <div style="padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="margin: 0 0 10px 0; font-size: 1rem; color: #f3f4f6;">${nombre}</h4>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.85rem;">
+                                        <span style="background-color: #374151; padding: 2px 8px; border-radius: 12px; color: ${stock > 0 ? '#10b981' : '#ef4444'};">📦 Stock: ${stock}</span>
+                                        <span style="background-color: #374151; padding: 2px 8px; border-radius: 12px; color: #f59e0b;">Costo: $${costo}</span>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label style="font-size: 0.8rem; color: #a1a1aa;">Precio de Venta ($)</label>
+                                    <div style="display: flex; gap: 5px; margin-top: 5px;">
+                                        <input type="text" id="cat-precio-${index}" value="${precioVenta}" style="width: 100%; padding: 8px; border-radius: 6px; border: none; background-color: #3b424d; color: white;">
+                                        <button id="btn-cat-${index}" onclick="guardarPrecioCatalogo('${nombre}', 'cat-precio-${index}', 'btn-cat-${index}')" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 0 15px; font-weight: bold; cursor: pointer;">Guardar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                        grid.innerHTML += card;
+                    });
+                } else {
+                    grid.innerHTML = "<p style='color:#ef4444;'>Error al cargar datos.</p>";
+                }
+            } catch (error) {
+                grid.innerHTML = "<p style='color:#ef4444;'>Fallo de red.</p>";
+            }
+        }
+
+        async function guardarPrecioCatalogo(nombrePerfume, inputId, btnId) {
+            const nuevoPrecio = document.getElementById(inputId).value;
+            const btn = document.getElementById(btnId);
+            if(!nuevoPrecio) return alert("Ingresa un precio válido.");
+            
+            btn.innerText = "⏳"; btn.disabled = true;
+            try {
+                const response = await fetch('/api/actualizar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: passGuardada, nombre: nombrePerfume, precio: nuevoPrecio, imagen: "" })
+                });
+                if (response.ok) {
+                    btn.innerText = "✅"; btn.style.backgroundColor = "#065f46";
+                    setTimeout(() => { btn.innerText = "Guardar"; btn.style.backgroundColor = "#10b981"; btn.disabled = false; }, 2000);
+                } else {
+                    alert("Error al actualizar"); btn.innerText = "Guardar"; btn.disabled = false;
+                }
+            } catch(e) {
+                alert("Fallo de conexión"); btn.innerText = "Guardar"; btn.disabled = false;
+            }
         }
     </script>
 </body>
