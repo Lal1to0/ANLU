@@ -84,12 +84,19 @@
         <!-- CONTENIDO -->
         <div class="content-area">
             
-            <!-- Pestaña 1: Carga de IA -->
+           <!-- Pestaña 1: Carga de IA -->
             <div id="tab-ia" class="tab-content active">
                 <h2>Carga Automatizada de Productos</h2>
                 <div class="formulario-ia">
-                    <label>Nombre Exacto del Perfume</label>
+                    <label style="font-size: 0.8rem; color: #a1a1aa;">Nombre Exacto del Perfume</label>
                     <input type="text" id="perfume" placeholder="Ej: Tiana Bath and Body Works">
+
+                    <label style="font-size: 0.8rem; color: #a1a1aa;">Precio (Opcional)</label>
+                    <input type="text" id="precio-nuevo" placeholder="Ej: $25.00">
+
+                    <label style="font-size: 0.8rem; color: #a1a1aa;">URL de la Imagen PNG (Opcional)</label>
+                    <input type="text" id="imagen-nueva" placeholder="https://...">
+
                     <button onclick="generarDatos()" id="btn-generar">Generar e Inyectar Datos</button>
                     <div id="mensaje"></div>
                 </div>
@@ -173,10 +180,13 @@
         // Función de la IA (Conecta con tu api/generar.js)
         async function generarDatos() {
             const perfume = document.getElementById('perfume').value;
+            const precio = document.getElementById('precio-nuevo').value;
+            const imagen = document.getElementById('imagen-nueva').value;
+            
             const btn = document.getElementById('btn-generar');
             const divMensaje = document.getElementById('mensaje');
             
-            if(!perfume) { alert("Ingresa un perfume"); return; }
+            if(!perfume) { alert("Ingresa el nombre del perfume"); return; }
 
             btn.disabled = true;
             btn.innerText = "⏳ Consultando a la IA e inyectando...";
@@ -186,7 +196,8 @@
                 const response = await fetch('/api/generar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: passGuardada, perfume: perfume }) // Usa la contraseña del login
+                    // 🔴 ENVIAMOS TODO JUNTO AL BACKEND
+                    body: JSON.stringify({ password: passGuardada, perfume: perfume, precio: precio, imagen: imagen }) 
                 });
 
                 const data = await response.json();
@@ -196,7 +207,10 @@
                     divMensaje.style.backgroundColor = "#065f46";
                     divMensaje.style.color = "#a7f3d0";
                     divMensaje.innerText = data.resultado;
-                    document.getElementById('perfume').value = ""; // Limpiar campo
+                    // Limpiar campos
+                    document.getElementById('perfume').value = ""; 
+                    document.getElementById('precio-nuevo').value = ""; 
+                    document.getElementById('imagen-nueva').value = ""; 
                 } else {
                     divMensaje.style.backgroundColor = "#7f1d1d";
                     divMensaje.style.color = "#fecaca";
