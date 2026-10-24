@@ -3,29 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- 1. Título y Meta Descripción SEO -->
     <title>ANLU Parfums | Catálogo Oficial</title>
     <meta name="description" content="Descubre el catálogo oficial de ANLU Parfums. Fragancias exclusivas, perfumería de diseñador y árabes al mejor precio en Venezuela.">
     
-    <!-- 2. Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
 
-    <!-- 3. Open Graph (Tarjetas visuales para WhatsApp e Instagram) -->
     <meta property="og:title" content="ANLU Parfums | Catálogo Oficial">
     <meta property="og:description" content="Explora nuestro inventario en tiempo real y encuentra tu fragancia ideal.">
     <meta property="og:image" content="https://anlu-parfums.vercel.app/trans.png">
     <meta property="og:url" content="https://anlu-parfums.vercel.app">
     <meta property="og:type" content="website">
 
-    <!-- 4. Lógica de Tema Oscuro -->
     <script>
       if (localStorage.getItem('temaANLU') === 'oscuro' || (!('temaANLU' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
       }
     </script>
 
-    <!-- 5. Librerías Externas -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = { darkMode: 'class', }
@@ -33,93 +27,62 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
-    <!-- 6. Estilos Propios -->
     <style>
-      .accord-bar {
-        height: 22px;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        padding-left: 10px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #ffffff;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        margin-bottom: 6px;
-        transition: transform 0.15s ease;
-      }
-      .accord-bar:hover {
-        transform: scaleX(1.02);
-      }
+      .accord-bar { height: 22px; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-size: 0.75rem; font-weight: 700; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); margin-bottom: 6px; transition: transform 0.15s ease; }
+      .accord-bar:hover { transform: scaleX(1.02); }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans min-h-screen pb-16 transition-colors duration-300">
 
-  <!-- Header -->
   <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-30 transition-colors duration-300">
     <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
-      
-      <!-- Logo -->
       <div class="flex items-center justify-between w-full md:w-auto">
         <img src="1234.png" alt="ANLU Parfums Logo" class="h-14 md:h-36 object-contain">
       </div>
-
-      <!-- Buscador y Botones -->
       <div class="flex w-full md:w-auto items-center gap-2">
         <div class="w-full md:w-80 relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 dark:text-gray-500 text-sm"></i>
-          <input type="text" id="searchInput" placeholder="Buscar por nombre o marca..." 
-                 class="w-full pl-9 pr-4 py-2 border dark:border-gray-600 rounded-full text-sm bg-gray-50 dark:bg-gray-700 dark:text-white focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 transition">
+          <input type="text" id="searchInput" placeholder="Buscar por nombre o marca..." class="w-full pl-9 pr-4 py-2 border dark:border-gray-600 rounded-full text-sm bg-gray-50 dark:bg-gray-700 dark:text-white focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 transition">
         </div>
-        
         <button id="btnDarkMode" class="relative w-10 h-10 flex-shrink-0 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition" title="Cambiar tema">
           <i class="fa-solid fa-moon block dark:hidden"></i>
           <i class="fa-solid fa-sun hidden dark:block"></i>
         </button>
-
         <button onclick="toggleCart()" class="relative w-10 h-10 flex-shrink-0 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center hover:scale-105 transition shadow-sm" title="Ver Carrito">
           <i class="fa-solid fa-cart-shopping"></i>
           <span id="cartBadge" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden transition-all border border-white dark:border-gray-800">0</span>
         </button>
       </div>
     </div>
-
-    <!-- Filtros -->
     <div class="border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors duration-300">
       <div class="max-w-6xl mx-auto px-4 flex gap-2 overflow-x-auto py-2.5 scrollbar-none">
-        <button onclick="filterCategory('todos')" class="filter-btn active px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-900 dark:bg-white text-white dark:text-gray-900">Todos</button>
-        <button onclick="filterCategory('hombre')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">Hombre</button>
-        <button onclick="filterCategory('mujer')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">Mujer</button>
-        <button onclick="filterCategory('unisex')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">Unisex</button>
-        <button onclick="filterCategory('splash')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">Splash</button>
+        <button onclick="filterCategory(this, 'todos')" class="filter-btn active px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-900 dark:bg-white text-white dark:text-gray-900">Todos</button>
+        <button onclick="filterCategory(this, 'hombre')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">Hombre</button>
+        <button onclick="filterCategory(this, 'mujer')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">Mujer</button>
+        <button onclick="filterCategory(this, 'unisex')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">Unisex</button>
+        <button onclick="filterCategory(this, 'splash')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-semibold transition bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">Splash</button>
       </div>
     </div>
   </header>
 
-  <!-- Contenedor Principal -->
   <main class="max-w-6xl mx-auto px-4 py-8 relative">
     <div id="loading" class="text-center py-16">
       <i class="fa-solid fa-spinner fa-spin text-4xl text-gray-400 dark:text-gray-500 mb-4"></i>
       <p class="text-gray-500 dark:text-gray-400 font-medium text-lg">Cargando inventario...</p>
     </div>
-
     <div id="perfumesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 hidden"></div>
-    
     <div id="noResults" class="hidden text-center py-16">
       <p class="text-gray-500 dark:text-gray-400 font-medium text-lg">No encontramos perfumes que coincidan con tu búsqueda.</p>
     </div>
   </main>
 
-  <!-- SIDEBAR DEL CARRITO -->
   <div id="cartOverlay" onclick="toggleCart()" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm transition-opacity"></div>
   <div id="cartSidebar" class="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-gray-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
     <div class="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-700">
       <h2 class="text-lg font-black dark:text-white uppercase tracking-wider"><i class="fa-solid fa-cart-shopping mr-2"></i>Tu Pedido</h2>
       <button onclick="toggleCart()" class="text-gray-400 hover:text-gray-900 dark:hover:text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    
     <div id="cartItems" class="flex-1 overflow-y-auto p-5 space-y-5"></div>
-    
     <div class="p-5 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
        <div class="flex justify-between items-center mb-4">
          <span class="font-bold text-gray-500 dark:text-gray-400 uppercase text-sm">Total Estimado:</span>
@@ -132,10 +95,8 @@
     </div>
   </div>
 
-  <!-- Botones Flotantes (Derecha) -->
   <div class="fixed bottom-5 right-5 z-40 flex flex-col items-center gap-3">
-    <a href="https://instagram.com/anluu.lg" target="_blank" 
-       class="w-14 h-14 rounded-full bg-gradient-to-tr from-yellow-500 via-pink-500 to-purple-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center text-2xl group relative" title="Síguenos en Instagram">
+    <a href="https://instagram.com/anluu.lg" target="_blank" class="w-14 h-14 rounded-full bg-gradient-to-tr from-yellow-500 via-pink-500 to-purple-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center text-2xl group relative" title="Síguenos en Instagram">
       <i class="fa-brands fa-instagram"></i>
     </a>
     <div class="relative flex flex-col items-center">
@@ -164,7 +125,6 @@
     </div>
   </div>
 
-  <!-- Modal Detalle Perfume -->
   <div id="perfumeModal" class="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center hidden p-4 backdrop-blur-sm transition-colors duration-300">
     <div class="bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl relative max-h-[92vh] overflow-y-auto border border-transparent dark:border-gray-700 transition-colors duration-300">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 dark:hover:text-white text-2xl font-bold z-10">&times;</button>
@@ -172,7 +132,6 @@
     </div>
   </div>
 
-  <!-- Footer -->
   <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12 py-8 transition-colors duration-300">
     <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
       <div>
@@ -188,11 +147,7 @@
 
     btnDarkMode.addEventListener('click', () => {
       htmlElement.classList.toggle('dark');
-      if (htmlElement.classList.contains('dark')) {
-        localStorage.setItem('temaANLU', 'oscuro');
-      } else {
-        localStorage.setItem('temaANLU', 'claro');
-      }
+      localStorage.setItem('temaANLU', htmlElement.classList.contains('dark') ? 'oscuro' : 'claro');
     });
 
     const SHEET_ID = "1kCqVj7HIP7oouLyOmwptYOmbXEuzQARgxvmit7EdsXw";
@@ -200,7 +155,14 @@
     
     let perfumes = [];
     let currentCategory = "todos";
-    let cart = JSON.parse(localStorage.getItem('cartANLU')) || [];
+    let cart = [];
+    
+    // PROTECCIÓN 1: Si la caché falla, el sistema se recupera
+    try {
+        cart = JSON.parse(localStorage.getItem('cartANLU')) || [];
+    } catch(e) {
+        localStorage.removeItem('cartANLU');
+    }
 
     const grid = document.getElementById("perfumesGrid");
     const noResults = document.getElementById("noResults");
@@ -212,7 +174,6 @@
     function toggleCart() {
       const sidebar = document.getElementById('cartSidebar');
       const overlay = document.getElementById('cartOverlay');
-      
       if (sidebar.classList.contains('translate-x-full')) {
         sidebar.classList.remove('translate-x-full');
         overlay.classList.remove('hidden');
@@ -227,11 +188,8 @@
       const p = perfumes.find(item => item.id === id);
       if (!p) return;
       const existingItem = cart.find(item => item.id === id);
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        cart.push({ ...p, quantity: 1 });
-      }
+      if (existingItem) existingItem.quantity += 1;
+      else cart.push({ ...p, quantity: 1 });
       localStorage.setItem('cartANLU', JSON.stringify(cart));
       updateCartBadge();
       closeModal();
@@ -252,7 +210,6 @@
     function updateCartBadge() {
       const badge = document.getElementById('cartBadge');
       const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-      
       if (totalItems > 0) {
         badge.textContent = totalItems;
         badge.classList.remove('hidden');
@@ -266,35 +223,22 @@
     function renderCart() {
       const container = document.getElementById('cartItems');
       const totalEl = document.getElementById('cartTotal');
-      
       if (cart.length === 0) {
-        container.innerHTML = `
-          <div class="flex flex-col items-center justify-center h-full opacity-50">
-            <i class="fa-solid fa-cart-shopping text-6xl mb-4"></i>
-            <p class="font-medium text-lg">Tu carrito está vacío</p>
-          </div>
-        `;
+        container.innerHTML = `<div class="flex flex-col items-center justify-center h-full opacity-50"><i class="fa-solid fa-cart-shopping text-6xl mb-4"></i><p class="font-medium text-lg">Tu carrito está vacío</p></div>`;
         totalEl.textContent = '$0.00';
         return;
       }
-
       let total = 0;
       container.innerHTML = cart.map(item => {
         const isPreorder = item.price === "$0" || item.price === "$0.00";
-        if (!isPreorder) {
-          const priceNum = parseFloat(item.price.replace('$', ''));
-          total += priceNum * item.quantity;
-        }
+        if (!isPreorder) total += parseFloat(item.price.replace('$', '')) * item.quantity;
         return `
           <div class="flex gap-4 border-b border-gray-100 dark:border-gray-700 pb-4 items-center">
-            <!-- AQUÍ SE AÑADIÓ EL ATRIBUTO ALT AL CARRITO -->
             <img src="${item.image}" alt="Perfume ${item.name}" class="w-16 h-16 object-contain bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg p-1">
             <div class="flex-1">
               <h4 class="text-sm font-bold dark:text-white leading-tight">${item.name}</h4>
               <p class="text-[10px] text-gray-400 uppercase tracking-widest">${item.brand}</p>
-              <p class="font-black text-sm mt-1 ${isPreorder ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'}">
-                ${isPreorder ? 'Bajo Pedido' : item.price}
-              </p>
+              <p class="font-black text-sm mt-1 ${isPreorder ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'}">${isPreorder ? 'Bajo Pedido' : item.price}</p>
             </div>
             <div class="flex items-center gap-3 bg-gray-100 dark:bg-gray-900 rounded-lg p-1.5 border dark:border-gray-700">
               <button onclick="updateCartQuantity(${item.id}, -1)" class="w-6 h-6 flex items-center justify-center font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">-</button>
@@ -309,45 +253,27 @@
 
     function checkoutWhatsApp() {
       if (cart.length === 0) return;
-
       let text = "*Hola ANLU Perfumes*, me gustaría realizar el siguiente pedido:\n\n";
-      let total = 0;
-      let hasPreorder = false;
-
+      let total = 0, hasPreorder = false;
       cart.forEach(item => {
         const isPreorder = item.price === "$0" || item.price === "$0.00";
         if (isPreorder) hasPreorder = true;
-        
         let line = `• ${item.quantity}x ${item.name} (${item.brand})`;
         if (!isPreorder) {
-          const priceNum = parseFloat(item.price.replace('$', ''));
-          const subtotal = priceNum * item.quantity;
+          const subtotal = parseFloat(item.price.replace('$', '')) * item.quantity;
           line += ` - $${subtotal.toFixed(2)}`;
           total += subtotal;
-        } else {
-          line += ` - *(Por Encargar)*`;
-        }
+        } else line += ` - *(Por Encargar)*`;
         text += line + "\n";
       });
-
       text += `\n*TOTAL ESTIMADO: $${total.toFixed(2)}*`;
-      
-      if (hasPreorder) {
-        text += `\n\nNota: Mi pedido incluye artículos bajo encargo. Por favor confirmarme disponibilidad y precio actual.`;
-      }
-
+      if (hasPreorder) text += `\n\nNota: Mi pedido incluye artículos bajo encargo. Por favor confirmarme disponibilidad y precio actual.`;
       text += "\n\nQuedo atento(a) para coordinar el pago y la entrega. ¡Gracias!";
-
       const numerosWa = ["584243306803", "584124596671"]; 
-      const numeroElegido = numerosWa[Math.floor(Math.random() * numerosWa.length)];
-      
-      const url = `https://wa.me/${numeroElegido}?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
+      window.open(`https://wa.me/${numerosWa[Math.floor(Math.random() * numerosWa.length)]}?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    function toggleWaPopup() {
-      document.getElementById("waPopup").classList.toggle("hidden");
-    }
+    function toggleWaPopup() { document.getElementById("waPopup").classList.toggle("hidden"); }
 
     function getAccordColor(name) {
       if (!name) return "#5D6D7E";
@@ -366,65 +292,52 @@
 
     function cargarDatos(esSilencioso = false) {
       const urlConAntiCache = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&t=${Date.now()}`;
+      
+      // PROTECCIÓN 2: Si el navegador bloquea PapaParse (Escudos de Brave)
+      if (typeof Papa === 'undefined') {
+          if(!esSilencioso) loading.innerHTML = `<div class="text-red-500 max-w-sm mx-auto"><i class="fa-solid fa-shield text-4xl mb-3"></i><p class='font-bold'>Conexión Bloqueada</p><p class='text-sm mt-1 text-gray-400'>Parece que tu navegador (Brave) está bloqueando la base de datos. Por favor, apaga los escudos (ícono del león) para esta página.</p></div>`;
+          return;
+      }
+
       Papa.parse(urlConAntiCache, {
         download: true,
         header: false,
-        complete: function(results) {
-          const rawData = results.data;
-          let nuevosPerfumes = [];
-          
-          rawData.forEach((row, index) => {
-            if (!row || row.length < 5 || !row[1] || row[1].trim().toLowerCase() === "nombre") return;
-
-            let nombre = row[1] ? row[1].trim() : "";
-            let marca = row[2] ? row[2].trim() : "";
-            let genero = row[3] ? row[3].trim().toLowerCase() : "unisex";
-            let precioCrudo = row[4] ? row[4].toString() : "";
-            let stockCrudo = row[5] ? row[5].toString() : "1";
-            let imagen = row[6] ? row[6].trim() : "";
-            let concentracion = row[7] ? row[7].trim() : "";
-            
-            if (nombre === "") return;
-
-            let cleanPrice = precioCrudo.replace(/[^0-9.,]/g, "").replace(",", ".");
-            let priceVal = parseFloat(cleanPrice);
-            let stockVal = parseInt(stockCrudo, 10);
-            if (isNaN(stockVal)) stockVal = 1;
-
-            let isOutOfStock = stockVal <= 0;
-            let priceStr = (isNaN(priceVal) || priceVal === 0 || isOutOfStock) ? "$0" : "$" + priceVal.toFixed(2);
-
-            let accords = [];
-            const widths = ["100%", "85%", "70%", "55%", "40%"];
-            for(let i=0; i<5; i++) {
-              let aName = row[8 + i];
-              if(aName && aName.trim() !== "") {
-                accords.push({ name: aName.trim(), width: widths[i], color: getAccordColor(aName) });
-              }
+        error: function(err) {
+            // PROTECCIÓN 3: Si la API de Google falla o bloquea la red
+            if (!esSilencioso) {
+                loading.innerHTML = `<div class="text-red-500"><i class="fa-solid fa-triangle-exclamation text-4xl mb-3"></i><p class='font-bold'>Error de Red</p><p class='text-sm mt-1 text-gray-400'>No pudimos conectar con Google Sheets.</p></div>`;
             }
-            nuevosPerfumes.push({
-              id: index + 1,
-              name: nombre,
-              brand: marca,
-              gender: genero,
-              price: priceStr,
-              image: imagen,
-              concentration: concentracion,
-              accords: accords,
-              topNotes: row[13] ? row[13].split(',').map(s=>s.trim()) : [],
-              heartNotes: row[14] ? row[14].split(',').map(s=>s.trim()) : [],
-              baseNotes: row[15] ? row[15].split(',').map(s=>s.trim()) : []
-            });
-          });
-
-          if (JSON.stringify(nuevosPerfumes) !== JSON.stringify(perfumes)) {
-            perfumes = nuevosPerfumes;
-            applyFilters();
-          }
-          if (!esSilencioso) {
-            loading.classList.add("hidden");
-            grid.classList.remove("hidden");
-            updateCartBadge();
+        },
+        complete: function(results) {
+          try {
+              const rawData = results.data;
+              let nuevosPerfumes = [];
+              rawData.forEach((row, index) => {
+                if (!row || row.length < 5 || !row[1] || row[1].trim().toLowerCase() === "nombre") return;
+                let nombre = row[1] ? row[1].trim() : "", marca = row[2] ? row[2].trim() : "", genero = row[3] ? row[3].trim().toLowerCase() : "unisex", precioCrudo = row[4] ? row[4].toString() : "", stockCrudo = row[5] ? row[5].toString() : "1", imagen = row[6] ? row[6].trim() : "", concentracion = row[7] ? row[7].trim() : "";
+                if (nombre === "") return;
+                let cleanPrice = precioCrudo.replace(/[^0-9.,]/g, "").replace(",", "."), priceVal = parseFloat(cleanPrice), stockVal = parseInt(stockCrudo, 10);
+                if (isNaN(stockVal)) stockVal = 1;
+                let priceStr = (isNaN(priceVal) || priceVal === 0 || stockVal <= 0) ? "$0" : "$" + priceVal.toFixed(2);
+                let accords = [];
+                const widths = ["100%", "85%", "70%", "55%", "40%"];
+                for(let i=0; i<5; i++) {
+                  let aName = row[8 + i];
+                  if(aName && aName.trim() !== "") accords.push({ name: aName.trim(), width: widths[i], color: getAccordColor(aName) });
+                }
+                nuevosPerfumes.push({ id: index + 1, name: nombre, brand: marca, gender: genero, price: priceStr, image: imagen, concentration: concentracion, accords: accords });
+              });
+              if (JSON.stringify(nuevosPerfumes) !== JSON.stringify(perfumes)) {
+                perfumes = nuevosPerfumes;
+                applyFilters();
+              }
+              if (!esSilencioso) {
+                loading.classList.add("hidden");
+                grid.classList.remove("hidden");
+                updateCartBadge();
+              }
+          } catch (error) {
+              if (!esSilencioso) loading.innerHTML = `<p class='text-red-500 font-bold'>Error procesando los datos</p>`;
           }
         }
       });
@@ -445,10 +358,7 @@
         return `
         <div onclick="openModal(${p.id})" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition duration-200 cursor-pointer overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col justify-between group">
           <div class="h-64 flex items-center justify-center p-4 bg-gray-50/70 dark:bg-gray-700/50 relative">
-            ${isPreorder 
-              ? '<span class="absolute top-3 right-3 bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[10px] font-black px-2 py-1 rounded-md uppercase">Bajo Pedido</span>'
-              : '<span class="absolute top-3 right-3 bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300 text-[10px] font-black px-2 py-1 rounded-md uppercase">Disponible</span>'}
-            <!-- AQUÍ SE AÑADIÓ EL ATRIBUTO ALT A LAS TARJETAS -->
+            ${isPreorder ? '<span class="absolute top-3 right-3 bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[10px] font-black px-2 py-1 rounded-md uppercase">Bajo Pedido</span>' : '<span class="absolute top-3 right-3 bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300 text-[10px] font-black px-2 py-1 rounded-md uppercase">Disponible</span>'}
             <img src="${p.image}" alt="Perfume ${p.name}" class="h-full object-contain group-hover:scale-105 transition" onerror="this.src='https://via.placeholder.com/300x400?text=ANLU'">
           </div>
           <div class="p-4 flex flex-col justify-between flex-1">
@@ -472,7 +382,6 @@
       modalContent.innerHTML = `
         <div class="flex flex-col md:flex-row gap-6 items-center md:items-start mb-6">
           <div class="w-48 h-48 flex items-center justify-center bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 p-2 relative">
-            <!-- AQUÍ SE AÑADIÓ EL ATRIBUTO ALT A LA IMAGEN GRANDE DEL MODAL -->
             <img src="${p.image}" alt="Perfume ${p.name}" class="max-h-full max-w-full object-contain" onerror="this.src='https://via.placeholder.com/300x400?text=ANLU'">
           </div>
           <div class="flex-1 w-full">
@@ -500,26 +409,25 @@
 
     function closeModal() { modal.classList.add("hidden"); }
 
-    function filterCategory(cat) {
+    // PROTECCIÓN 4: Arreglo de compatibilidad con navegadores estrictos
+    function filterCategory(btnElement, cat) {
       currentCategory = cat;
       document.querySelectorAll(".filter-btn").forEach(btn => {
         btn.classList.remove("bg-gray-900", "text-white", "dark:bg-white", "dark:text-gray-900");
         btn.classList.add("bg-gray-100", "text-gray-600", "dark:bg-gray-700", "dark:text-gray-300");
       });
-      event.target.classList.remove("bg-gray-100", "text-gray-600", "dark:bg-gray-700", "dark:text-gray-300");
-      event.target.classList.add("bg-gray-900", "text-white", "dark:bg-white", "dark:text-gray-900");
+      btnElement.classList.remove("bg-gray-100", "text-gray-600", "dark:bg-gray-700", "dark:text-gray-300");
+      btnElement.classList.add("bg-gray-900", "text-white", "dark:bg-white", "dark:text-gray-900");
       applyFilters();
     }
 
     function applyFilters() {
       const q = searchInput.value.toLowerCase().trim();
-      const filtered = perfumes.filter(p => {
-        return (currentCategory === "todos" || p.gender === currentCategory) && 
-               (p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q));
-      });
+      const filtered = perfumes.filter(p => (currentCategory === "todos" || p.gender === currentCategory) && (p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q)));
       filtered.sort((a, b) => (a.price === "$0" || a.price === "$0.00") - (b.price === "$0" || b.price === "$0.00"));
       renderCards(filtered);
     }
+    
     searchInput.addEventListener("input", applyFilters);
     modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
   </script>
