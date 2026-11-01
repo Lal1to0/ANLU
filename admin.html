@@ -80,7 +80,7 @@
                 <h2 class="text-xl font-bold mb-4">Carga Automatizada de Productos</h2>
                 <div class="formulario-ia">
                     <label style="font-size: 0.8rem; color: #a1a1aa;">Nombre Exacto del Perfume</label>
-                    <input type="text" id="perfume" placeholder="Ej: Tiana Bath and Body Works">
+                    <input type="text" id="perfume" placeholder="Ej: Tres Nuit Lyric">
 
                     <label style="font-size: 0.8rem; color: #a1a1aa;">Precio (Opcional)</label>
                     <input type="text" id="precio-nuevo" placeholder="Ej: $25.00">
@@ -93,15 +93,40 @@
                 </div>
             </div>
 
-         <!-- Pestaña 2: Base de Datos y Edición Directa -->
+         <!-- Pestaña 2: Base de Datos y Reposición Directa en Supabase -->
             <div id="tab-bd" class="tab-content">
                 <h2 class="text-xl font-bold mb-4">Inventario en Tiempo Real (Supabase)</h2>
                 
+                <!-- MÓDULO DE REPOSICIÓN DE MERCANCÍA -->
+                <div style="background-color: #272c33; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3b82f6;">
+                    <h3 style="margin-top: 0; color: #60a5fa; font-size: 1rem;">📦 Ingresar Nueva Mercancía (Reposición)</h3>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
+                        <div style="flex: 2; min-width: 200px;">
+                            <label style="font-size: 0.8rem; color: #a1a1aa;">Perfume</label>
+                            <input type="text" id="repo-nombre" placeholder="Ej: Tres Nuit Lyric" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
+                        </div>
+                        <div style="flex: 1; min-width: 100px;">
+                            <label style="font-size: 0.8rem; color: #a1a1aa;">Proveedor</label>
+                            <input type="text" id="repo-proveedor" placeholder="Ej: Dubai" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
+                        </div>
+                        <div style="flex: 1; min-width: 80px;">
+                            <label style="font-size: 0.8rem; color: #a1a1aa;">Cantidad</label>
+                            <input type="number" id="repo-cantidad" placeholder="Ej: 1" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
+                        </div>
+                        <div style="flex: 1; min-width: 100px;">
+                            <label style="font-size: 0.8rem; color: #a1a1aa;">Costo Unit. ($)</label>
+                            <input type="text" id="repo-costo" placeholder="Ej: 30" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
+                        </div>
+                        <button onclick="reponerInventario()" id="btn-reponer" style="background-color: #3b82f6; color: white; padding: 10px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; height: 38px;">Ingresar Stock</button>
+                    </div>
+                    <div id="mensaje-repo" style="margin-top: 15px; padding: 10px; border-radius: 6px; display: none;"></div>
+                </div>
+
                 <!-- EDITOR INTERNO DE ANLU -->
                 <div style="background-color: #272c33; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
                     <div style="flex: 1; min-width: 200px;">
                         <label style="font-size: 0.8rem; color: #a1a1aa;">Perfume a Editar (Nombre exacto)</label>
-                        <input type="text" id="edit-nombre" placeholder="Ej: Tiana Bath and Body Works" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
+                        <input type="text" id="edit-nombre" placeholder="Ej: Tres Nuit Lyric" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
                     </div>
                     <div style="flex: 1; min-width: 100px;">
                         <label style="font-size: 0.8rem; color: #a1a1aa;">Nuevo Precio</label>
@@ -116,7 +141,7 @@
                 <div id="mensaje-edicion" style="margin-bottom: 15px; padding: 10px; border-radius: 6px; display: none;"></div>
 
                 <div class="table-container">
-                    <p style="color: #60a5fa; margin-bottom: 10px;">ℹ️ Tu base de datos principal opera de forma nativa en Supabase. Puedes gestionar precios y stock directamente desde la pestaña de <b>Catálogo Visual</b>.</p>
+                    <p style="color: #60a5fa; margin-bottom: 10px;">ℹ️ Tu base de datos principal opera de forma nativa en Supabase. Gestiona tus productos desde aquí o desde la pestaña de <b>Catálogo Visual</b>.</p>
                 </div>
             </div>
 
@@ -157,7 +182,7 @@
         // CONEXIÓN OFICIAL A SUPABASE
         // ==========================================
         const SUPABASE_URL = "https://lnuirjvcxurrhrmcuwvq.supabase.co";
-        const SUPABASE_KEY = "sb_secret_O4q__UeHCgiZO32Uj4Hktg_noooyA6c"; 
+        const SUPABASE_KEY = "sb_publishable_JGmDgoTtnKcvG5qKXZSJjw_aWFXUDMA"; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const CLAVE_ACCESO = "Lalo2211."; 
@@ -268,6 +293,65 @@
                 divMensaje.innerText = "❌ Error al guardar en Supabase: " + (error.message || "Fallo de conexión");
             }
             btn.disabled = false; btn.innerText = "Generar e Inyectar Datos";
+        }
+
+        // REPOSICIÓN DE MERCANCÍA DIRECTAMENTE EN SUPABASE
+        async function reponerInventario() {
+            const nombreBuscado = document.getElementById('repo-nombre').value.trim();
+            const cantidadStr = document.getElementById('repo-cantidad').value;
+            const btn = document.getElementById('btn-reponer');
+            const divMensaje = document.getElementById('mensaje-repo');
+
+            if(!nombreBuscado || !cantidadStr) { alert("Llena el nombre del perfume y la cantidad."); return; }
+            
+            btn.disabled = true; 
+            btn.innerText = "⏳ Actualizando stock..."; 
+            divMensaje.style.display = "none";
+
+            try {
+                const cantidadAñadir = parseInt(cantidadStr) || 0;
+
+                const { data: productosEncontrados, error: errorBusqueda } = await supabaseClient
+                    .from('productos')
+                    .select('id, stock, nombre')
+                    .ilike('nombre', `%${nombreBuscado}%`);
+
+                if (errorBusqueda) throw errorBusqueda;
+
+                if (!productosEncontrados || productosEncontrados.length === 0) {
+                    throw new Error("Perfume no encontrado en la base de datos de Supabase.");
+                }
+
+                const productoActual = productosEncontrados[0];
+                const stockActual = parseInt(productoActual.stock) || 0;
+                const nuevoStock = stockActual + cantidadAñadir;
+
+                const { error: errorUpdate } = await supabaseClient
+                    .from('productos')
+                    .update({ stock: nuevoStock })
+                    .eq('id', productoActual.id);
+
+                if (errorUpdate) throw errorUpdate;
+
+                divMensaje.style.display = "block";
+                divMensaje.style.backgroundColor = "#065f46"; 
+                divMensaje.style.color = "#a7f3d0"; 
+                divMensaje.innerText = `✅ ¡Stock actualizado para "${productoActual.nombre}"! Anterior: ${stockActual} | Nuevo Stock: ${nuevoStock}`;
+                
+                document.getElementById('repo-nombre').value = ""; 
+                document.getElementById('repo-cantidad').value = ""; 
+                document.getElementById('repo-proveedor').value = ""; 
+                document.getElementById('repo-costo').value = ""; 
+
+            } catch (error) {
+                console.error("Error en reposición:", error);
+                divMensaje.style.display = "block"; 
+                divMensaje.style.backgroundColor = "#7f1d1d"; 
+                divMensaje.style.color = "#fecaca"; 
+                divMensaje.innerText = "❌ Error: " + (error.message || "No se pudo actualizar el stock.");
+            }
+            btn.disabled = false; 
+            btn.innerText = "Ingresar Stock";
         }
 
         // Editar Precios e Imágenes manual directamente en Supabase
