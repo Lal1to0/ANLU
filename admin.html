@@ -8,6 +8,9 @@
     <!-- LIBRERÍA DE TAILWIND PARA EL DISEÑO RESPONSIVO MÓVIL -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- CLIENTE OFICIAL DE SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         /* PANTALLA DE LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #1a1e23; display: flex; justify-content: center; align-items: center; z-index: 1000; }
@@ -33,9 +36,8 @@
         .formulario-ia button { background-color: #3b82f6; color: white; font-weight: bold; cursor: pointer; }
         #mensaje { margin-top: 15px; padding: 15px; border-radius: 6px; display: none; }
         
-        /* IFRAME GOOGLE SHEETS PREMIUM */
-        .table-container { border-radius: 8px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); background-color: #1a1e23; border: 1px solid #3b424d; }
-        iframe { width: 100%; height: 75vh; border: none; filter: invert(0.88) hue-rotate(180deg); }
+        /* CONTENEDOR DE TABLA / VISTA */
+        .table-container { border-radius: 8px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); background-color: #1a1e23; border: 1px solid #3b424d; padding: 20px; }
         
         /* Ocultar barra de scroll en los botones de móvil */
         .scrollbar-none::-webkit-scrollbar { display: none; }
@@ -55,7 +57,7 @@
         </div>
     </div>
 
-    <!-- DASHBOARD RESPONSIVO (Oculto por defecto, flex-col para móvil y md:flex-row para PC) -->
+    <!-- DASHBOARD RESPONSIVO -->
     <div id="dashboard" class="hidden w-full h-full flex-col md:flex-row">
         
         <!-- BARRA LATERAL -->
@@ -66,7 +68,6 @@
                 <button class="tab-btn" onclick="abrirPestana(event, 'tab-bd')">📊 Base de Datos</button>
                 <button class="tab-btn" onclick="abrirPestana(event, 'tab-analiticas')">📈 Analíticas</button>
                 <button class="tab-btn" onclick="abrirPestana(event, 'tab-catalogo'); cargarCatalogoAdmin();">🛒 Catálogo Visual</button>
-                <!-- Botón manual para cerrar sesión -->
                 <button class="tab-btn md:mt-auto" onclick="cerrarSesion()" style="color: #ef4444; font-weight: bold;">🚪 Salir</button>
             </div>
         </div>
@@ -92,34 +93,9 @@
                 </div>
             </div>
 
-         <!-- Pestaña 2: Base de Datos (Google Sheets) -->
+         <!-- Pestaña 2: Base de Datos y Edición Directa -->
             <div id="tab-bd" class="tab-content">
-                <h2 class="text-xl font-bold mb-4">Inventario en Tiempo Real</h2>
-                
-                <!-- MÓDULO DE REPOSICIÓN DE MERCANCÍA -->
-                <div style="background-color: #272c33; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3b82f6;">
-                    <h3 style="margin-top: 0; color: #60a5fa; font-size: 1rem;">📦 Ingresar Nueva Mercancía (Reposición)</h3>
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
-                        <div style="flex: 2; min-width: 200px;">
-                            <label style="font-size: 0.8rem; color: #a1a1aa;">Perfume</label>
-                            <input type="text" id="repo-nombre" placeholder="Ej: Tiana Bath and Body Works" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
-                        </div>
-                        <div style="flex: 1; min-width: 100px;">
-                            <label style="font-size: 0.8rem; color: #a1a1aa;">Proveedor</label>
-                            <input type="text" id="repo-proveedor" placeholder="Ej: Dubai" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
-                        </div>
-                        <div style="flex: 1; min-width: 80px;">
-                            <label style="font-size: 0.8rem; color: #a1a1aa;">Cantidad</label>
-                            <input type="number" id="repo-cantidad" placeholder="Ej: 12" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
-                        </div>
-                        <div style="flex: 1; min-width: 100px;">
-                            <label style="font-size: 0.8rem; color: #a1a1aa;">Costo Unit. ($)</label>
-                            <input type="text" id="repo-costo" placeholder="Ej: 15.50" style="width: 100%; padding: 10px; border-radius: 6px; border: none; background-color: #3b424d; color: white; margin-top: 5px;">
-                        </div>
-                        <button onclick="reponerInventario()" id="btn-reponer" style="background-color: #3b82f6; color: white; padding: 10px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; height: 38px;">Ingresar Stock</button>
-                    </div>
-                    <div id="mensaje-repo" style="margin-top: 15px; padding: 10px; border-radius: 6px; display: none;"></div>
-                </div>
+                <h2 class="text-xl font-bold mb-4">Inventario en Tiempo Real (Supabase)</h2>
                 
                 <!-- EDITOR INTERNO DE ANLU -->
                 <div style="background-color: #272c33; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
@@ -140,7 +116,7 @@
                 <div id="mensaje-edicion" style="margin-bottom: 15px; padding: 10px; border-radius: 6px; display: none;"></div>
 
                 <div class="table-container">
-                    <iframe id="iframe-sheets" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vS5AE2sLXFhZxsyvbxFAxTFIApUx2fsaxSArZ8JI1_cFxqhjpdCnc8haFrrSIFvbmpEJcxHTiXIHw4D/pubhtml?gid=1819198756&single=true&chrome=false&widget=false&headers=false"></iframe>
+                    <p style="color: #60a5fa; margin-bottom: 10px;">ℹ️ Tu base de datos principal opera de forma nativa en Supabase. Puedes gestionar precios y stock directamente desde la pestaña de <b>Catálogo Visual</b>.</p>
                 </div>
             </div>
 
@@ -157,20 +133,8 @@
                         <p id="val-inventario" style="font-size: 1.8rem; font-weight: bold; color: #10b981; margin: 10px 0 0 0;">$0.00</p>
                     </div>
                     <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #3b82f6; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-                        <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Ventas Totales</h4>
-                        <p id="val-ventas" style="font-size: 1.8rem; font-weight: bold; color: #3b82f6; margin: 10px 0 0 0;">$0.00</p>
-                    </div>
-                    <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #f59e0b; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-                        <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Costo de Mercancía</h4>
-                        <p id="val-costo" style="font-size: 1.8rem; font-weight: bold; color: #f59e0b; margin: 10px 0 0 0;">$0.00</p>
-                    </div>
-                    <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #10b981; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-                        <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Ganancia Real</h4>
-                        <p id="val-ganancia" style="font-size: 1.8rem; font-weight: bold; color: #10b981; margin: 10px 0 0 0;">$0.00</p>
-                    </div>
-                    <div style="background-color: #272c33; padding: 20px; border-radius: 8px; border-top: 4px solid #ef4444; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-                        <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Cuentas por Cobrar</h4>
-                        <p id="val-porcobrar" style="font-size: 1.8rem; font-weight: bold; color: #ef4444; margin: 10px 0 0 0;">$0.00</p>
+                        <h4 style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Productos Totales</h4>
+                        <p id="val-ventas" style="font-size: 1.8rem; font-weight: bold; color: #3b82f6; margin: 10px 0 0 0;">0</p>
                     </div>
                 </div>
             </div>
@@ -178,24 +142,31 @@
             <!-- Pestaña 4: Catálogo Visual Admin -->
             <div id="tab-catalogo" class="tab-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 class="text-xl font-bold">Catálogo Visual</h2>
+                    <h2 class="text-xl font-bold">Catálogo Visual & Inventario</h2>
                     <button onclick="cargarCatalogoAdmin()" style="background-color: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer;">🔄 Refrescar</button>
                 </div>
                 <div id="grid-catalogo" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
                 </div>
             </div>
 
-        </div> <!-- Cierra content-area -->
-    </div> <!-- Cierra dashboard -->
+        </div>
+    </div>
 
     <script>
+        // ==========================================
+        // CONEXIÓN OFICIAL A SUPABASE
+        // ==========================================
+        const SUPABASE_URL = "https://lnuirjvcxurrhrmcuwvq.supabase.co";
+        const SUPABASE_KEY = "sb_secret_O4q__UeHCgiZO32Uj4Hktg_noooyA6c"; 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         const CLAVE_ACCESO = "Lalo2211."; 
         let passGuardada = "";
 
         // ==========================================
-        // 1. SISTEMA DE SESIÓN Y TEMPORIZADOR
+        // SISTEMA DE SESIÓN Y TEMPORIZADOR
         // ==========================================
-        const TIEMPO_INACTIVIDAD = 7200000; // 2 horas en milisegundos (2 * 60 * 60 * 1000)
+        const TIEMPO_INACTIVIDAD = 7200000; // 2 horas
         let temporizador;
 
         function reiniciarTemporizador() {
@@ -204,46 +175,40 @@
         }
 
         function cerrarSesion() {
-            localStorage.removeItem('adminANLUPass'); // Borra la memoria de sesión
-            window.location.reload(); // Recarga la página y vuelve a pedir la clave
+            localStorage.removeItem('adminANLUPass');
+            window.location.reload();
         }
 
-        // Detectar actividad para reiniciar el reloj
         window.onload = function() {
             document.onmousemove = reiniciarTemporizador;
             document.onkeypress = reiniciarTemporizador;
             document.ontouchstart = reiniciarTemporizador;
             document.onscroll = reiniciarTemporizador;
             
-            // Verificador de Auto-login
             const passGuardadaLS = localStorage.getItem('adminANLUPass');
             if (passGuardadaLS === CLAVE_ACCESO) {
                 document.getElementById('login-pass').value = passGuardadaLS;
-                verificarLogin(true); // Si tiene la llave guardada, entra automático
+                verificarLogin(true);
             }
         };
 
-        // ==========================================
-        // 2. LÓGICA DE LA APLICACIÓN
-        // ==========================================
         function verificarLogin(esAutoLogin = false) {
             const inputPass = document.getElementById('login-pass').value;
             if (inputPass === CLAVE_ACCESO) {
                 passGuardada = inputPass;
-                localStorage.setItem('adminANLUPass', inputPass); // Guarda la credencial en el navegador
+                localStorage.setItem('adminANLUPass', inputPass);
                 
                 document.getElementById('login-screen').style.display = "none";
                 const dash = document.getElementById('dashboard');
                 dash.classList.remove('hidden');
-                dash.classList.add('flex'); // Aplica el flex-col y md:flex-row de Tailwind
+                dash.classList.add('flex');
                 
-                reiniciarTemporizador(); // Arranca el cronómetro
+                reiniciarTemporizador();
             } else {
                 if(!esAutoLogin) document.getElementById('login-error').style.display = "block";
             }
         }
 
-        // Pestañas
         function abrirPestana(evt, idPestana) {
             let i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
@@ -258,211 +223,202 @@
             evt.currentTarget.classList.add("active");
         }
 
-        // IA
+        // IA - Carga y almacenamiento directo en Supabase
         async function generarDatos() {
-            const perfume = document.getElementById('perfume').value;
-            const precio = document.getElementById('precio-nuevo').value;
-            const imagen = document.getElementById('imagen-nueva').value;
+            const perfumeInput = document.getElementById('perfume').value.trim();
+            const precioInput = document.getElementById('precio-nuevo').value.trim();
+            const imagenInput = document.getElementById('imagen-nueva').value.trim();
             const btn = document.getElementById('btn-generar');
             const divMensaje = document.getElementById('mensaje');
             
-            if(!perfume) { alert("Ingresa el nombre del perfume"); return; }
-            btn.disabled = true; btn.innerText = "⏳ Consultando a la IA..."; divMensaje.style.display = "none";
+            if(!perfumeInput) { alert("Ingresa el nombre del perfume"); return; }
+            btn.disabled = true; btn.innerText = "⏳ Consultando e insertando en Supabase..."; divMensaje.style.display = "none";
 
             try {
-                const response = await fetch('/api/generar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: passGuardada, perfume: perfume, precio: precio, imagen: imagen }) 
-                });
-                const data = await response.json();
+                const precioLimpio = precioInput ? parseFloat(precioInput.replace("$", "").replace(",", ".")) : 0.0;
+                
+                const nuevoPerfume = {
+                    nombre: perfumeInput,
+                    marca: "ANLU Parfums",
+                    precio: precioLimpio,
+                    stock: 1,
+                    imagen_url: imagenInput || "https://via.placeholder.com/200x200?text=ANLU"
+                };
+
+                const { data, error } = await supabaseClient
+                    .from('productos')
+                    .insert([nuevoPerfume]);
+
+                if (error) throw error;
+
                 divMensaje.style.display = "block";
-                if (response.ok) {
-                    divMensaje.style.backgroundColor = "#065f46"; divMensaje.style.color = "#a7f3d0";
-                    divMensaje.innerText = data.resultado;
-                    document.getElementById('perfume').value = ""; 
-                    document.getElementById('precio-nuevo').value = ""; 
-                    document.getElementById('imagen-nueva').value = ""; 
-                } else {
-                    divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca";
-                    divMensaje.innerText = "❌ Error: " + data.error;
-                }
+                divMensaje.style.backgroundColor = "#065f46"; 
+                divMensaje.style.color = "#a7f3d0";
+                divMensaje.innerText = `✅ ¡Perfume "${perfumeInput}" agregado exitosamente a Supabase!`;
+                
+                document.getElementById('perfume').value = ""; 
+                document.getElementById('precio-nuevo').value = ""; 
+                document.getElementById('imagen-nueva').value = ""; 
+
             } catch (error) {
-                divMensaje.style.display = "block"; divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca"; divMensaje.innerText = "❌ Fallo de conexión.";
+                console.error("Error al insertar en Supabase:", error);
+                divMensaje.style.display = "block"; 
+                divMensaje.style.backgroundColor = "#7f1d1d"; 
+                divMensaje.style.color = "#fecaca"; 
+                divMensaje.innerText = "❌ Error al guardar en Supabase: " + (error.message || "Fallo de conexión");
             }
             btn.disabled = false; btn.innerText = "Generar e Inyectar Datos";
         }
 
-        // Reposición
-        async function reponerInventario() {
-            const nombre = document.getElementById('repo-nombre').value;
-            const proveedor = document.getElementById('repo-proveedor').value;
-            const cantidad = document.getElementById('repo-cantidad').value;
-            const costo = document.getElementById('repo-costo').value;
-            const btn = document.getElementById('btn-reponer');
-            const divMensaje = document.getElementById('mensaje-repo');
-
-            if(!nombre || !proveedor || !cantidad || !costo) { alert("Llena todos los campos."); return; }
-            btn.disabled = true; btn.innerText = "⏳ Procesando..."; divMensaje.style.display = "none";
-
-            try {
-                const response = await fetch('/api/reponer', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: passGuardada, nombre: nombre, proveedor: proveedor, cantidad: cantidad, costo: costo })
-                });
-                const data = await response.json();
-                divMensaje.style.display = "block";
-                if (response.ok) {
-                    divMensaje.style.backgroundColor = "#065f46"; divMensaje.style.color = "#a7f3d0"; divMensaje.innerText = data.resultado;
-                    document.getElementById('repo-nombre').value = ""; document.getElementById('repo-cantidad').value = "";
-                    const iframe = document.getElementById('iframe-sheets'); iframe.src = iframe.src;
-                } else {
-                    divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca"; divMensaje.innerText = "❌ Error: " + data.error;
-                }
-            } catch (error) {
-                divMensaje.style.display = "block"; divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca"; divMensaje.innerText = "❌ Fallo de red.";
-            }
-            btn.disabled = false; btn.innerText = "Ingresar Stock";
-        }
-
-        // Editar Precios e Imágenes manual
+        // Editar Precios e Imágenes manual directamente en Supabase
         async function guardarEdicion() {
-            const nombre = document.getElementById('edit-nombre').value;
-            const precio = document.getElementById('edit-precio').value;
-            const imagen = document.getElementById('edit-imagen').value;
+            const nombreBuscado = document.getElementById('edit-nombre').value.trim();
+            const precioStr = document.getElementById('edit-precio').value;
+            const imagen = document.getElementById('edit-imagen').value.trim();
             const btn = document.getElementById('btn-guardar');
             const divMensaje = document.getElementById('mensaje-edicion');
 
-            if(!nombre) { alert("Escribe el nombre del perfume"); return; }
-            if(!precio && !imagen) { alert("Debes escribir un precio o una imagen nueva"); return; }
+            if(!nombreBuscado) { alert("Escribe el nombre del perfume"); return; }
+            if(!precioStr && !imagen) { alert("Debes escribir un precio o una imagen nueva"); return; }
 
             btn.disabled = true; btn.innerText = "⏳ Guardando..."; divMensaje.style.display = "none";
 
             try {
-                const response = await fetch('/api/actualizar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: passGuardada, nombre: nombre, precio: precio, imagen: imagen })
-                });
-                const data = await response.json();
-                divMensaje.style.display = "block";
-                if (response.ok) {
-                    divMensaje.style.backgroundColor = "#065f46"; divMensaje.style.color = "#a7f3d0"; divMensaje.innerText = data.resultado;
-                    document.getElementById('edit-precio').value = ""; document.getElementById('edit-imagen').value = "";
-                    const iframe = document.getElementById('iframe-sheets'); iframe.src = iframe.src;
-                } else {
-                    divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca"; divMensaje.innerText = "❌ Error: " + data.error;
+                let datosActualizados = {};
+                if (precioStr) {
+                    datosActualizados.precio = parseFloat(precioStr.replace("$", "").replace(",", "."));
                 }
+                if (imagen) {
+                    datosActualizados.imagen_url = imagen;
+                }
+
+                const { error } = await supabaseClient
+                    .from('productos')
+                    .update(datosActualizados)
+                    .ilike('nombre', `%${nombreBuscado}%`);
+
+                if (error) throw error;
+
+                divMensaje.style.display = "block";
+                divMensaje.style.backgroundColor = "#065f46"; divMensaje.style.color = "#a7f3d0";
+                divMensaje.innerText = "✅ ¡Cambios guardados en Supabase!";
+                
+                document.getElementById('edit-nombre').value = ""; 
+                document.getElementById('edit-precio').value = ""; 
+                document.getElementById('edit-imagen').value = ""; 
             } catch (error) {
-                divMensaje.style.display = "block"; divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca"; divMensaje.innerText = "❌ Fallo de red.";
+                divMensaje.style.display = "block"; divMensaje.style.backgroundColor = "#7f1d1d"; divMensaje.style.color = "#fecaca";
+                divMensaje.innerText = "❌ Error al actualizar en Supabase.";
             }
             btn.disabled = false; btn.innerText = "Guardar Cambios";
         }
 
-        // Finanzas
+        // Finanzas / Métricas directas desde Supabase
         async function cargarFinanzas() {
             const btn = document.getElementById('btn-finanzas');
             btn.disabled = true; btn.innerText = "⏳ Cargando...";
 
             try {
-                const response = await fetch('/api/finanzas', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: passGuardada })
-                });
+                const { data: perfumes, error } = await supabaseClient
+                    .from('productos')
+                    .select('precio, stock');
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    document.getElementById('val-inventario').innerText = data.inventario || "$0.00";
-                    document.getElementById('val-ventas').innerText = data.ventas || "$0.00";
-                    document.getElementById('val-costo').innerText = data.costo || "$0.00";
-                    document.getElementById('val-ganancia').innerText = data.ganancia || "$0.00";
-                    document.getElementById('val-porcobrar').innerText = data.porCobrar || "$0.00";
-                } else {
-                    alert("Error al cargar las métricas.");
-                }
+                if (error) throw error;
+
+                let valorTotalInventario = 0;
+                let totalProductos = perfumes ? perfumes.length : 0;
+
+                perfumes.forEach(p => {
+                    const precio = parseFloat(p.precio) || 0;
+                    const stock = parseInt(p.stock) || 0;
+                    valorTotalInventario += (precio * stock);
+                });
+
+                document.getElementById('val-inventario').innerText = `$${valorTotalInventario.toFixed(2)}`;
+                document.getElementById('val-ventas').innerText = totalProductos;
             } catch (error) {
-                alert("Fallo de red.");
+                alert("Error al cargar las métricas de Supabase.");
             }
             btn.disabled = false; btn.innerText = "🔄 Actualizar";
         }
 
-        // Catálogo Visual
+        // Catálogo Visual Admin conectado a Supabase
         async function cargarCatalogoAdmin() {
             const grid = document.getElementById('grid-catalogo');
-            grid.innerHTML = "<p style='color:#a1a1aa;'>Cargando inventario...</p>";
+            grid.innerHTML = "<p style='color:#a1a1aa;'>Cargando inventario desde Supabase...</p>";
 
             try {
-                const response = await fetch('/api/inventario', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: passGuardada })
-                });
+                const { data: perfumes, error } = await supabaseClient
+                    .from('productos')
+                    .select('*')
+                    .order('id', { ascending: true });
                 
-                if (response.ok) {
-                    const perfumes = await response.json();
-                    grid.innerHTML = ""; 
-                    
-                    perfumes.forEach((p, index) => {
-                        const nombre = p["Nombre"] || "Sin nombre";
-                        const imagen = p["Imagen_URL"] || "https://via.placeholder.com/200x200?text=Sin+Imagen";
-                        const stock = p["Stock"] || "0";
-                        const precioVenta = p["Precio"] || "";
-                        const costo = p["Costo"] || p["Precio de Compra"] || p["Costo_Unitario"] || "N/A";
+                if (error) throw error;
 
-                        const card = `
-                        <div style="background-color: #272c33; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
-                            <div style="height: 200px; background-color: #ffffff; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                                <img src="${imagen}" alt="Perfume" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                            </div>
-                            <div style="padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
-                                <div>
-                                    <h4 style="margin: 0 0 10px 0; font-size: 1rem; color: #f3f4f6;">${nombre}</h4>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.85rem;">
-                                        <span style="background-color: #374151; padding: 2px 8px; border-radius: 12px; color: ${stock > 0 ? '#10b981' : '#ef4444'};">📦 Stock: ${stock}</span>
-                                        <span style="background-color: #374151; padding: 2px 8px; border-radius: 12px; color: #f59e0b;">Costo: $${costo}</span>
-                                    </div>
-                                </div>
-                                <div style="margin-top: 10px;">
-                                    <label style="font-size: 0.8rem; color: #a1a1aa;">Precio de Venta ($)</label>
-                                    <div style="display: flex; gap: 5px; margin-top: 5px;">
-                                        <input type="text" id="cat-precio-${index}" value="${precioVenta}" style="width: 100%; padding: 8px; border-radius: 6px; border: none; background-color: #3b424d; color: white;">
-                                        <button id="btn-cat-${index}" onclick="guardarPrecioCatalogo('${nombre}', 'cat-precio-${index}', 'btn-cat-${index}')" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 0 15px; font-weight: bold; cursor: pointer;">Guardar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>`;
-                        grid.innerHTML += card;
-                    });
-                } else {
-                    grid.innerHTML = "<p style='color:#ef4444;'>Error al cargar datos.</p>";
+                grid.innerHTML = ""; 
+                
+                if (!perfumes || perfumes.length === 0) {
+                    grid.innerHTML = "<p style='color:#a1a1aa;'>No hay productos registrados.</p>";
+                    return;
                 }
+
+                perfumes.forEach((p, index) => {
+                    const idProducto = p.id;
+                    const nombre = p.nombre || "Sin nombre";
+                    const imagen = p.imagen_url || "https://via.placeholder.com/200x200?text=Sin+Imagen";
+                    const stock = p.stock !== null ? p.stock : "0";
+                    const precioVenta = p.precio !== null ? p.precio : "";
+                    const costo = p.costo !== null ? p.costo : "N/A";
+
+                    const card = `
+                    <div style="background-color: #272c33; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
+                        <div style="height: 200px; background-color: #ffffff; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <img src="${imagen}" alt="Perfume" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                        </div>
+                        <div style="padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <h4 style="margin: 0 0 10px 0; font-size: 1rem; color: #f3f4f6;">${nombre}</h4>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.85rem;">
+                                    <span style="background-color: #374151; padding: 2px 8px; border-radius: 12px; color: ${stock > 0 ? '#10b981' : '#ef4444'};">📦 Stock: ${stock}</span>
+                                    <span style="background-color: #374151; padding: 2px 8px; border-radius: 12px; color: #f59e0b;">Costo: $${costo}</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <label style="font-size: 0.8rem; color: #a1a1aa;">Precio de Venta ($)</label>
+                                <div style="display: flex; gap: 5px; margin-top: 5px;">
+                                    <input type="text" id="cat-precio-${index}" value="${precioVenta}" style="width: 100%; padding: 8px; border-radius: 6px; border: none; background-color: #3b424d; color: white;">
+                                    <button id="btn-cat-${index}" onclick="guardarPrecioCatalogo(${idProducto}, 'cat-precio-${index}', 'btn-cat-${index}')" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 0 15px; font-weight: bold; cursor: pointer;">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                    grid.innerHTML += card;
+                });
             } catch (error) {
-                grid.innerHTML = "<p style='color:#ef4444;'>Fallo de red.</p>";
+                grid.innerHTML = "<p style='color:#ef4444;'>Error al conectar con Supabase.</p>";
             }
         }
 
-        async function guardarPrecioCatalogo(nombrePerfume, inputId, btnId) {
-            const nuevoPrecio = document.getElementById(inputId).value;
+        async function guardarPrecioCatalogo(idPerfume, inputId, btnId) {
+            const nuevoPrecioStr = document.getElementById(inputId).value;
             const btn = document.getElementById(btnId);
-            if(!nuevoPrecio) return alert("Ingresa un precio válido.");
+            if(!nuevoPrecioStr) return alert("Ingresa un precio válido.");
+            
+            const nuevoPrecio = parseFloat(nuevoPrecioStr.replace("$", "").replace(",", "."));
             
             btn.innerText = "⏳"; btn.disabled = true;
             try {
-                const response = await fetch('/api/actualizar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: passGuardada, nombre: nombrePerfume, precio: nuevoPrecio, imagen: "" })
-                });
-                if (response.ok) {
-                    btn.innerText = "✅"; btn.style.backgroundColor = "#065f46";
-                    setTimeout(() => { btn.innerText = "Guardar"; btn.style.backgroundColor = "#10b981"; btn.disabled = false; }, 2000);
-                } else {
-                    alert("Error al actualizar"); btn.innerText = "Guardar"; btn.disabled = false;
-                }
+                const { error } = await supabaseClient
+                    .from('productos')
+                    .update({ precio: nuevoPrecio })
+                    .eq('id', idPerfume);
+
+                if (error) throw error;
+
+                btn.innerText = "✅"; btn.style.backgroundColor = "#065f46";
+                setTimeout(() => { btn.innerText = "Guardar"; btn.style.backgroundColor = "#10b981"; btn.disabled = false; }, 2000);
             } catch(e) {
-                alert("Fallo de conexión"); btn.innerText = "Guardar"; btn.disabled = false;
+                alert("Error al actualizar en Supabase"); btn.innerText = "Guardar"; btn.disabled = false;
             }
         }
     </script>
